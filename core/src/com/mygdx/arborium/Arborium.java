@@ -1,33 +1,39 @@
 package com.mygdx.arborium;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Game;
+import com.mygdx.arborium.game.Farm;
+import com.mygdx.arborium.screen.FarmScreen;
+import com.mygdx.arborium.screen.PlotScreen;
 
-public class Arborium extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
-	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
-	}
+public class Arborium extends Game
+{
+	public FarmScreen farmScreen;
+	public PlotScreen[] plotScreens;
+
+	public Farm farm;
 
 	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	public void create()
+	{
+		farm = new Farm();
+
+		farmScreen = new FarmScreen(this);
+
+		plotScreens = new PlotScreen[farm.getPlotSize()];
+		for (int i = 0; i < farm.getPlotSize(); i++)
+		{
+			PlotScreen scrn = new PlotScreen(this, farm.getPlot(i));
+			plotScreens[i] = scrn;
+		}
+
+		setScreen(new FarmScreen(this));
 	}
-	
+
 	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
+	public void render()
+	{
+		super.render();
 	}
+
+
 }
