@@ -7,12 +7,15 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.game.Plot;
-import com.mygdx.arborium.game.Seed;
+import com.mygdx.arborium.game.Tree;
+import com.mygdx.arborium.game.TreeList;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,8 +29,9 @@ public class PlotScreen implements Screen
     private Plot plot;
     private Stage stage;
 
-    Label matureTime;
-    Label produceTime;
+    Table table;
+
+    Label timer;
 
     Skin skin;
     TextButton backButton;
@@ -40,22 +44,18 @@ public class PlotScreen implements Screen
         stage = new Stage(new ScreenViewport());
         this.plot = plot;
 
+        table = new Table();
+        table.setFillParent(true);
+        //table.setDebug(true);
+        stage.addActor(table);
+
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        matureTime = new Label("", skin);
-        matureTime.setSize(250, 150);
-        matureTime.setFontScale(2);
-        matureTime.setPosition(GDX_WIDTH/2 - matureTime,
-                                GDX_HEIGHT/2 + GDX_WIDTH/2);
+        timer = new Label("", skin);
+        timer.setAlignment(Align.center);
+        timer.setFontScale(2);
 
-        produceTime = new Label("", skin);
-        produceTime.setSize(250, 150);
-        produceTime.setFontScale(2);
-        produceTime.setPosition(GDX_WIDTH/2 - produceTime.getWidth()/2,
-                GDX_HEIGHT/2 + GDX_WIDTH/2);
-
-        stage.addActor(matureTime);
-        stage.addActor(produceTime);
+        table.add(timer).width(500).expandX().center().space(25);
 
         initializeButtons();
         addButtonListeners();
@@ -83,8 +83,7 @@ public class PlotScreen implements Screen
         {
             plot.update();
 
-            Seed tree = plot.getPlantedTree();
-            if (tree != null && tree.isReadyToHarvest())
+            if (!plot.isEmpty() && plot.isReadyToHarvest())
                 harvestButton.setVisible(true);
         }
 
@@ -113,8 +112,7 @@ public class PlotScreen implements Screen
         {
             plot.update();
 
-            Seed tree = plot.getPlantedTree();
-            if (tree != null && tree.isReadyToHarvest())
+            if (!plot.isEmpty() && plot.isReadyToHarvest())
                 harvestButton.setVisible(true);
         }
         else
@@ -148,21 +146,18 @@ public class PlotScreen implements Screen
         int centerX = Gdx.graphics.getWidth() / 2;
         int centerY = Gdx.graphics.getHeight() / 2;
 
-        backButton = new TextButton("Back", skin);
-        backButton.setSize(100, 50);
-        backButton.setPosition(centerX - 50, centerY - 200);
-        stage.addActor(backButton);
-
         plantButton = new TextButton("Plant", skin);
-        plantButton.setSize(100, 50);
-        plantButton.setPosition(centerX - 50, centerY + 200);
-        stage.addActor(plantButton);
+        table.row();
+        table.add(plantButton).width(100).expandX().space(25);
 
         harvestButton = new TextButton("Harvest", skin);
-        harvestButton.setSize(100, 50);
-        harvestButton.setPosition(centerX - 50, centerY);
         harvestButton.setVisible(false);
-        stage.addActor(harvestButton);
+        table.row();
+        table.add(harvestButton).width(100).space(25);
+
+        backButton = new TextButton("Back", skin);
+        table.row();
+        table.add(backButton).width(100).space(25);
     }
 
     private void addButtonListeners()
@@ -182,8 +177,8 @@ public class PlotScreen implements Screen
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
-                Gdx.app.log("PlotScreen", "Seed planted");
-                plot.plantSeed(new Seed(5, 1, 5));
+                Gdx.app.log("PlotScreen", "Tree planted");
+                plot.plantSeed(TreeList.appleTree);
                 plantButton.setVisible(false);
                 Gdx.app.log("PlotScreen", "plot empty: " + plot.isEmpty());
             }
@@ -194,9 +189,8 @@ public class PlotScreen implements Screen
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
             {
-                Seed tree = plot.getPlantedTree();
-                if (tree != null && tree.isReadyToHarvest())
-                    tree.harvest();
+                if (!plot.isEmpty() && plot.isReadyToHarvest())
+                    plot.harvest();
                 harvestButton.setVisible(false);
                 return true;
             }
@@ -207,41 +201,32 @@ public class PlotScreen implements Screen
     {
         if (!plot.isEmpty())
         {
-            Seed tree = plot.getPlantedTree();
-            if (tree.isReadyToHarvest())
+            Tree tree = plot.getPlantedTree();
+            if (plot.isReadyToHarvest())
             {
-                produceTime.setText("Ready to harvest");
-                produceTime.setVisible(true);
-                matureTime.setVisible(false);
+                timer.setText("Ready to harvest");
             }
-            else if (tree.isMature())
+            else if (plot.isMature())
             {
                 long timeToProduce = tree.getProduceRate()
-                        - tree.getTimeSinceLastHarvest();
+                        - plot.getTimeSinceLastHarvest();
 
                 String format = timeFormat(timeToProduce);
 
-                produceTime.setText("Time to next harvest: " + format);
-
-                produceTime.setVisible(true);
-                matureTime.setVisible(false);
+                timer.setText("Time to next harvest: " + format);
             }
             else
             {
-                long timeToMature = (tree.getMatureTime() - tree.getTimeSincePlanted());
+                long timeToMature = (tree.getMatureTime() - plot.getTimeSincePlanted());
 
                 String format = timeFormat(timeToMature);
 
-                matureTime.setText("Time to mature: " + format);
-
-                matureTime.setVisible(true);
-                produceTime.setVisible(false);
+                timer.setText("Time to mature: " + format);
             }
         }
         else
         {
-            matureTime.setVisible(false);
-            produceTime.setVisible(false);
+            timer.setText("");
         }
     }
 

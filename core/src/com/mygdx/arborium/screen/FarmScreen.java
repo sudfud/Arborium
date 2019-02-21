@@ -5,8 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -23,6 +25,7 @@ public class FarmScreen implements Screen
 
     private Farm farm;
 
+    private Table table;
     private TextButton[] testHarvestButtons;
     private Label[] plotLabels;
     private Skin skin;
@@ -33,6 +36,11 @@ public class FarmScreen implements Screen
         stage = new Stage(new ScreenViewport());
 
         farm = game.farm;
+
+        table = new Table();
+        table.setFillParent(true);
+        //table.setDebug(true);
+        stage.addActor(table);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
@@ -99,22 +107,20 @@ public class FarmScreen implements Screen
         int yOffset = 200;
         int centerX = Gdx.graphics.getWidth() / 2 - 50;
         int centerY = Gdx.graphics.getHeight() / 2 - 50;
+        int column = 0;
 
         // Initialize buttons for each farm plot, and align in 3x3 grid
         for (int i = 0; i < testHarvestButtons.length; i++)
         {
             TextButton button = new TextButton("Plot " + (i + 1), skin);
-            button.setSize(100, 100);
 
-            button.setPosition(centerX + xOffset, centerY + yOffset);
-            if (xOffset >= 200)
+            table.add(button).width(100).height(100).expand();
+            column++;
+            if (column >= 3)
             {
-                yOffset -= 200;
-                xOffset = -200;
+                table.row();
+                column = 0;
             }
-            else
-                xOffset += 200;
-
             final int index = i;
 
             // Send to plot screen on click
@@ -138,8 +144,6 @@ public class FarmScreen implements Screen
             });
 
             testHarvestButtons[i] = button;
-
-            stage.addActor(testHarvestButtons[i]);
         }
     }
 }

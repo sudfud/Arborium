@@ -1,13 +1,12 @@
 package com.mygdx.arborium.game;
 
-public class Fruit
+public class Fruit extends ShopItem
 {
     private int sellValue;
     private int seedCount;
 
-    public Fruit(int sellValue, int seedCount)
+    public Fruit(int id, String name, int buyValue, int sellValue)
     {
-        this.sellValue = sellValue;
-        this.seedCount = seedCount;
+        super(id, name, buyValue, sellValue);
     }
 }

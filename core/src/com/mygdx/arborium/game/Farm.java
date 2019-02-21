@@ -8,7 +8,7 @@ public class Farm
     {
         plots = new Plot[9];
         for (int i = 0; i < plots.length; i++)
-            plots[i] = new Plot();
+            plots[i] = new Plot(i);
     }
 
     public void update()
