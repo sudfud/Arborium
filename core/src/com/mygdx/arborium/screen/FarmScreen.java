@@ -3,6 +3,8 @@ package com.mygdx.arborium.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -29,7 +31,10 @@ public class FarmScreen implements Screen
     private TextButton[] testHarvestButtons;
     private Label[] plotLabels;
     private Skin skin;
-//hi
+
+    private SpriteBatch batch;
+    private Texture sky, grass, dirtplot;
+
     public FarmScreen(Arborium game)
     {
         this.game = game;
@@ -52,6 +57,11 @@ public class FarmScreen implements Screen
     public void show()
     {
         Gdx.input.setInputProcessor(stage);
+
+        batch = new SpriteBatch();
+        sky = new Texture(Gdx.files.internal("background_sky.png"));
+        grass = new Texture(Gdx.files.internal("grass.png"));
+        dirtplot = new Texture(Gdx.files.internal("dirtplot.png"));
     }
 
     @Override
@@ -67,10 +77,22 @@ public class FarmScreen implements Screen
                 buttonText += "\nEmpty";
 
             testHarvestButtons[i].setText(buttonText);
+            batch.begin();
+            batch.draw(dirtplot, testHarvestButtons[i].getX(), testHarvestButtons[i].getY());
+            batch.end();
         }
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        batch.begin();
+        batch.draw(grass, 0, 0, 0, 0, (int)stage.getWidth() , (int)stage.getHeight()*2);
+        for (int i = 0; i < farm.getPlotSize(); i++)
+        {
+            batch.draw(dirtplot, testHarvestButtons[i].getX()-225, testHarvestButtons[i].getY()-400);
+        }
+        batch.end();
+
         stage.act();
         stage.draw();
     }

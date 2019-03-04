@@ -3,6 +3,8 @@ package com.mygdx.arborium.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -37,6 +39,10 @@ public class PlotScreen implements Screen
     TextButton backButton;
     TextButton plantButton;
     TextButton harvestButton;
+
+    private SpriteBatch batch;
+    private Texture sky, grass, dirtplot, dirtpatch, adult_tree,
+    youngAdult_tree, teenager_tree, child_tree, baby_tree;
 
     public PlotScreen(final Arborium game, Plot plot)
     {
@@ -74,25 +80,67 @@ public class PlotScreen implements Screen
         plantButton.setVisible(plot.isEmpty());
 
         Gdx.input.setInputProcessor(stage);
+
+        batch = new SpriteBatch();
+        sky = new Texture(Gdx.files.internal("background_sky.png"));
+        grass = new Texture(Gdx.files.internal("grass.png"));
+        dirtplot = new Texture(Gdx.files.internal("dirtplot.png"));
+        dirtpatch = new Texture(Gdx.files.internal("dirtpatch.png"));
+        adult_tree = new Texture(Gdx.files.internal("tree1_adult.png"));
+        youngAdult_tree = new Texture(Gdx.files.internal("tree1_youngadult.png"));
+        teenager_tree = new Texture(Gdx.files.internal("tree1_teenager.png"));
+        child_tree = new Texture(Gdx.files.internal("tree1_child.png"));
+        baby_tree = new Texture(Gdx.files.internal("tree1_baby.png"));
     }
 
     @Override
-    public void render(float delta)
-    {
-        if (!plot.isEmpty())
-        {
+    public void render(float delta) {
+        if (!plot.isEmpty()) {
             plot.update();
 
             if (!plot.isEmpty() && plot.isReadyToHarvest())
                 harvestButton.setVisible(true);
+            batch.begin();
+            batch.draw(adult_tree, -240, 265);
+            batch.end();
         }
 
         updateLabels();
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        batch.begin();
+        batch.draw(sky, 0, 0, 0, 0, (int) stage.getWidth(), (int) stage.getHeight());
+        batch.draw(grass, 0, 0);
+        batch.draw(dirtplot, (int) (stage.getWidth() / 4), 0);
+        if (!plot.isEmpty() && plot.isReadyToHarvest()){
+            batch.draw(dirtpatch, -240, 265);
+            batch.draw(adult_tree, -240, 265);
+        }else if (!plot.isEmpty() && (plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() *4/5) )){
+            batch.draw(dirtpatch, -240, 265);
+            batch.draw(youngAdult_tree, -240, 265);
+        }else if (!plot.isEmpty() && (plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() *3/5) )){
+            batch.draw(dirtpatch, -240, 265);
+            batch.draw(teenager_tree, -240, 265);
+        }
+        else if (!plot.isEmpty() && (plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() *2/5) )){
+            batch.draw(dirtpatch, -240, 265);
+            batch.draw(child_tree, -240, 265);
+        }else if (!plot.isEmpty() && (plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() /5) )){
+            batch.draw(dirtpatch, -240, 265);
+            batch.draw(baby_tree, -240, 265);
+        }
+        else if (!plot.isEmpty() ) {
+            batch.draw(dirtpatch, -240, 265);
+        }
+
+
+        batch.end();
+
         stage.act();
         stage.draw();
+
     }
 
     @Override
