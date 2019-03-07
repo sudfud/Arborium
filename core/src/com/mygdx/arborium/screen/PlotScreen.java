@@ -347,15 +347,18 @@ public class PlotScreen implements Screen
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
             {
                 //stack.remove();
-                stack.removeActor(seedSelectTable);
-                stack.removeActor(table);
-                String seedName = seedSelectList.getSelected();
-                Seed seed = SeedList.get(seedName);
-                seedImage.setDrawable(new TextureRegionDrawable(seed.itemImage));
-                seedImage.setScale(0.5f);
-                seedImage.setPosition(GDX_WIDTH/2 - seedImage.getWidth()/4, GDX_HEIGHT * 3/4);
-                seedImage.setVisible(true);
-                stage.addActor(seedImage);
+                if (seedSelectList.getItems().size > 0)
+                {
+                    stack.removeActor(seedSelectTable);
+                    stack.removeActor(table);
+                    String seedName = seedSelectList.getSelected();
+                    Seed seed = SeedList.get(seedName);
+                    seedImage.setDrawable(new TextureRegionDrawable(seed.itemImage));
+                    seedImage.setScale(0.5f);
+                    seedImage.setPosition(GDX_WIDTH / 2 - seedImage.getWidth() / 4, GDX_HEIGHT * 3 / 4);
+                    seedImage.setVisible(true);
+                    stage.addActor(seedImage);
+                }
 
                 return true;
             }

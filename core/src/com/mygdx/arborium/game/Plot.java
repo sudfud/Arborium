@@ -85,6 +85,7 @@ public class Plot
         pref.putBoolean(matureKey, false);
         pref.putLong(plantTimeKey, plantedTime);
         pref.putString(treeKey, plantedTree.itemName);
+        pref.putLong(harvestKey, plantedTime);
         pref.flush();
     }
 
@@ -98,8 +99,9 @@ public class Plot
             if (!mature && timeSincePlanted > matureTime)
             {
                 mature = true;
-                lastHarvestTime = System.currentTimeMillis();
+                lastHarvestTime = TimeUtils.millis();
                 pref.putBoolean(matureKey, true);
+                pref.flush();
             }
 
             else if (mature)

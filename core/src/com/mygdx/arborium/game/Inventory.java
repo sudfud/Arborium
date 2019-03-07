@@ -76,6 +76,11 @@ public class Inventory
         return inventory.containsKey(item);
     }
 
+    public static String[] getItems()
+    {
+        return inventory.keySet().toArray(new String[inventory.size()]);
+    }
+
     public static String[] getItems(InventoryCategory cat)
     {
         ArrayList<String> records = new ArrayList<String>();
@@ -92,6 +97,11 @@ public class Inventory
         }
 
         return records.toArray(new String[records.size()]);
+    }
+
+    public static boolean isEmpty()
+    {
+        return inventory.isEmpty();
     }
 
     private static void updateInventory()

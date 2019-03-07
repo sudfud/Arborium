@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -18,16 +19,24 @@ import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Inventory;
+import com.mygdx.arborium.items.Item;
 import com.mygdx.arborium.items.SeedList;
+import com.mygdx.arborium.items.ShopItem;
 
 public class ShopScreen implements Screen
 {
     private String selectedItemName;
     private int selectedItemPrice;
 
+    // Keeps track of which shop section we're in; either Buy or Sell
+    private String currentSection = "Buy";
+
     private Arborium game;
 
-    List<String> seedList;
+    // Used to select between buying and selling items
+    SelectBox shopSelectBox;
+
+    List<String> itemList;
     Label currencyLabel;
     Label priceLabel;
     TextButton buyButton;
@@ -50,24 +59,47 @@ public class ShopScreen implements Screen
 
         skin = Resources.glassySkin;
 
+        shopSelectBox = new SelectBox(skin);
+        shopSelectBox.setItems("Buy", "Sell");
+        shopSelectBox.setSelected("Buy");
+        shopSelectBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                if (shopSelectBox.getSelected().equals("Buy"))
+                {
+                    itemList.setItems(SeedList.getSeedNames());
+                }
+                else
+                {
+                    itemList.setItems(Inventory.getItems());
+                }
+
+                buyButton.setText((String)shopSelectBox.getSelected());
+                updateLabels();
+            }
+        });
+        table.add(shopSelectBox).width(200);
+        table.row();
+
         String currentCurrency = "Currency: " + Currency.getAmount();
         currencyLabel = new Label(currentCurrency, skin);
         currencyLabel.setFontScale(2);
         table.add(currencyLabel).expandX().top().height(100);
         table.row();
 
-        seedList = new List<String>(skin);
-        seedList.getStyle().selection.setTopHeight(16);
-        seedList.getStyle().selection.setBottomHeight(16);
-        seedList.setItems(SeedList.getSeedNames());
-        seedList.addListener(new ChangeListener() {
+        itemList = new List<String>(skin);
+        itemList.getStyle().selection.setTopHeight(16);
+        itemList.getStyle().selection.setBottomHeight(16);
+        itemList.setItems(SeedList.getSeedNames());
+        itemList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
                 updateLabels();
             }
         });
-        table.add(seedList).height(500).width(300).center();
+        table.add(itemList).height(500).width(300).center();
         table.row();
 
         priceLabel = new Label("Price: ", skin);
@@ -81,11 +113,17 @@ public class ShopScreen implements Screen
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
             {
-                    if (Currency.subtract(selectedItemPrice))
-                        Inventory.addItem(selectedItemName, 1);
-                    updateLabels();
-                    Gdx.app.log("Shop", "Currency amt: " + Currency.getAmount());
-                    return true;
+                if (shopSelectBox.getSelected().equals("Buy") && Currency.subtract(selectedItemPrice))
+                    Inventory.addItem(selectedItemName, 1);
+
+                else
+                {
+                    Currency.add(selectedItemPrice);
+                    Inventory.takeItem(selectedItemName);
+                }
+
+                updateLabels();
+                return true;
             }
         });
         table.add();
@@ -147,14 +185,27 @@ public class ShopScreen implements Screen
 
     private void updateLabels()
     {
-        selectedItemName = seedList.getSelected();
-        selectedItemPrice = SeedList.get(selectedItemName).buyValue;
+        if (itemList.getItems().size > 0)
+        {
+            selectedItemName = itemList.getSelected();
+            ShopItem item = (ShopItem) Item.lookup(selectedItemName);
 
-        priceLabel.setText("Price: " + selectedItemPrice);
+            if (shopSelectBox.getSelected().equals("Buy"))
+                selectedItemPrice = item.buyValue;
+            else
+                selectedItemPrice = item.sellValue;
 
+            priceLabel.setText("Price: " + selectedItemPrice);
 
-        int currency = Currency.getAmount();
-        currencyLabel.setText("Currency: " + currency);
+            int currency = Currency.getAmount();
+            currencyLabel.setText("Currency: " + currency);
+
+            if (shopSelectBox.getSelected().equals("Buy")) {
+                itemList.setItems(SeedList.getSeedNames());
+            } else {
+                itemList.setItems(Inventory.getItems());
+            }
+        }
     }
 
     private void back()
