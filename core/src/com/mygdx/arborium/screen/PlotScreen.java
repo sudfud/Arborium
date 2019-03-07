@@ -3,19 +3,34 @@ package com.mygdx.arborium.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.Resources;
+import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.game.Plot;
-import com.mygdx.arborium.game.Tree;
-import com.mygdx.arborium.game.TreeList;
+import com.mygdx.arborium.items.Seed;
+import com.mygdx.arborium.items.SeedList;
+import com.mygdx.arborium.items.Tree;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +44,7 @@ public class PlotScreen implements Screen
     private Plot plot;
     private Stage stage;
 
+    Stack stack;
     Table table;
 
     Label timer;
@@ -38,24 +54,67 @@ public class PlotScreen implements Screen
     TextButton plantButton;
     TextButton harvestButton;
 
+    Table seedSelectTable;
+    ScrollPane seedSelectScrollPane;
+    List<String> seedSelectList;
+    TextButton seedSelectButton;
+    TextButton seedSelectBackButton;
+
+    Image seedImage;
+    private boolean seedTouched = false;
+
     public PlotScreen(final Arborium game, Plot plot)
     {
         this.game = game;
         stage = new Stage(new ScreenViewport());
+        stage.addActor(Resources.backgroundImage);
         this.plot = plot;
+
+        stack = new Stack();
+        stack.setFillParent(true);
+        stage.addActor(stack);
 
         table = new Table();
         table.setFillParent(true);
         //table.setDebug(true);
-        stage.addActor(table);
+        stack.add(table);
+        stack.setDebug(true);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = Resources.glassySkin;
 
         timer = new Label("", skin);
         timer.setAlignment(Align.center);
         timer.setFontScale(2);
 
         table.add(timer).width(500).expandX().center().space(25);
+
+        seedSelectTable = new Table();
+        seedSelectTable.setFillParent(true);
+
+        seedSelectList = new List<String>(skin);
+
+        seedSelectScrollPane = new ScrollPane(seedSelectList, skin);
+        seedSelectTable.add(seedSelectScrollPane).size(250, 500);
+
+        seedImage = new Image(Resources.seed2);
+        seedImage.addListener(new ClickListener()
+        {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
+            {
+                seedTouched = true;
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button)
+            {
+                seedTouched = false;
+                seedImage.setY(GDX_HEIGHT * 3/4);
+            }
+        });
+        seedImage.setVisible(false);
+        stage.addActor(seedImage);
 
         initializeButtons();
         addButtonListeners();
@@ -66,6 +125,9 @@ public class PlotScreen implements Screen
     {
         Gdx.app.log("PlotScreen", "show()");
         Gdx.app.log("PlotScreen", "plot empty: " + plot.isEmpty());
+
+        seedSelectList.setItems(Inventory.getItems(Inventory.InventoryCategory.SEED));
+        Gdx.app.log("PlotScreen", "" + seedSelectList.getItems().size);
 
         addButtonListeners();
 
@@ -91,6 +153,36 @@ public class PlotScreen implements Screen
 
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        game.spriteBatch.begin();
+        Texture background = Resources.backgroundTexture;
+        Texture grass = Resources.grassTexture;
+        Texture dirtPatch = Resources.dirtPatchTexture;
+        game.spriteBatch.draw(background, -background.getWidth()/2, 0);
+        game.spriteBatch.draw(grass, 0, -grass.getHeight()/4);
+        game.spriteBatch.draw(dirtPatch, Gdx.graphics.getWidth()/2 - dirtPatch.getWidth()/2, 200);
+        game.spriteBatch.end();
+
+        if (seedTouched)
+        {
+            int y = GDX_HEIGHT - Gdx.input.getY();
+
+            if (y <= 200)
+            {
+                seedImage.setVisible(false);
+                String seedName = seedSelectList.getSelected();
+                Seed seed = SeedList.get(seedName);
+                plot.plantSeed(seed.treeType);
+                Inventory.takeItem(seedName);
+                stack.add(table);
+                plantButton.setVisible(false);
+                backButton.setVisible(true);
+                seedTouched = false;
+            }
+
+            seedImage.setY(y);
+        }
+
         stage.act();
         stage.draw();
     }
@@ -143,21 +235,26 @@ public class PlotScreen implements Screen
 
     private void initializeButtons()
     {
-        int centerX = Gdx.graphics.getWidth() / 2;
-        int centerY = Gdx.graphics.getHeight() / 2;
-
         plantButton = new TextButton("Plant", skin);
         table.row();
-        table.add(plantButton).width(100).expandX().space(25);
+        table.add(plantButton).width(150).height(100).expandX().space(25);
 
         harvestButton = new TextButton("Harvest", skin);
         harvestButton.setVisible(false);
         table.row();
-        table.add(harvestButton).width(100).space(25);
+        table.add(harvestButton).width(150).height(100).space(25);
 
         backButton = new TextButton("Back", skin);
         table.row();
-        table.add(backButton).width(100).space(25);
+        table.add(backButton).width(150).height(100).pad(25);
+
+        seedSelectButton = new TextButton("Select", skin);
+        seedSelectTable.row();
+        seedSelectTable.add(seedSelectButton).size(150, 100).space(25);
+
+        seedSelectBackButton = new TextButton("Back", skin);
+        seedSelectTable.row();
+        seedSelectTable.add(seedSelectBackButton).size(150, 100).space(25);
     }
 
     private void addButtonListeners()
@@ -178,8 +275,10 @@ public class PlotScreen implements Screen
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
                 Gdx.app.log("PlotScreen", "Tree planted");
-                plot.plantSeed(TreeList.appleTree);
-                plantButton.setVisible(false);
+                // plot.plantSeed(TreeList.appleTree);
+                stack.add(seedSelectTable);
+                backButton.setVisible(false);
+                // plantButton.setVisible(false);
                 Gdx.app.log("PlotScreen", "plot empty: " + plot.isEmpty());
             }
         });
@@ -192,6 +291,38 @@ public class PlotScreen implements Screen
                 if (!plot.isEmpty() && plot.isReadyToHarvest())
                     plot.harvest();
                 harvestButton.setVisible(false);
+                return true;
+            }
+        });
+
+        seedSelectButton.addListener(new ClickListener()
+        {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
+            {
+                //stack.remove();
+                stack.removeActor(seedSelectTable);
+                stack.removeActor(table);
+                String seedName = seedSelectList.getSelected();
+                Seed seed = SeedList.get(seedName);
+                seedImage.setDrawable(new TextureRegionDrawable(seed.itemImage));
+                seedImage.setScale(0.5f);
+                seedImage.setPosition(GDX_WIDTH/2 - seedImage.getWidth()/4, GDX_HEIGHT * 3/4);
+                seedImage.setVisible(true);
+                stage.addActor(seedImage);
+
+                return true;
+            }
+        });
+
+        seedSelectBackButton.addListener(new ClickListener()
+        {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
+            {
+                backButton.setVisible(true);
+                stack.removeActor(seedSelectTable);
+                addButtonListeners();
                 return true;
             }
         });

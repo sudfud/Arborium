@@ -1,6 +1,4 @@
-package com.mygdx.arborium.game;
-
-import com.badlogic.gdx.utils.TimeUtils;
+package com.mygdx.arborium.items;
 
 public class Tree extends Item
 {

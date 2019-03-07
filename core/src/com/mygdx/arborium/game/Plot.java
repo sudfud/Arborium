@@ -3,6 +3,8 @@ package com.mygdx.arborium.game;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.items.Tree;
+import com.mygdx.arborium.items.TreeList;
 
 public class Plot
 {
@@ -112,10 +114,7 @@ public class Plot
 
     public void harvest()
     {
-        for (int i = 0; i < produceAmount; i++)
-        {
-            Inventory.addItem(plantedTree.getFruit());
-        }
+        Inventory.addItem(plantedTree.getFruit().itemName, produceAmount);
         timeSinceLastHarvest = 0;
         lastHarvestTime = TimeUtils.millis();
         readyToHarvest = false;
