@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -62,6 +63,9 @@ public class PlotScreen implements Screen
 
     Image seedImage;
     private boolean seedTouched = false;
+    private SpriteBatch batch;
+    private Texture sky, grass, dirtplot, dirtpatch, adult_tree,
+    youngAdult_tree, teenager_tree, child_tree, baby_tree;
 
     public PlotScreen(final Arborium game, Plot plot)
     {
@@ -136,17 +140,29 @@ public class PlotScreen implements Screen
         plantButton.setVisible(plot.isEmpty());
 
         Gdx.input.setInputProcessor(stage);
+
+        batch = new SpriteBatch();
+        sky = new Texture(Gdx.files.internal("background_sky.png"));
+        grass = new Texture(Gdx.files.internal("grass.png"));
+        dirtplot = new Texture(Gdx.files.internal("dirtplot.png"));
+        dirtpatch = new Texture(Gdx.files.internal("dirtpatch.png"));
+        adult_tree = new Texture(Gdx.files.internal("tree1_adult.png"));
+        youngAdult_tree = new Texture(Gdx.files.internal("tree1_youngadult.png"));
+        teenager_tree = new Texture(Gdx.files.internal("tree1_teenager.png"));
+        child_tree = new Texture(Gdx.files.internal("tree1_child.png"));
+        baby_tree = new Texture(Gdx.files.internal("tree1_baby.png"));
     }
 
     @Override
-    public void render(float delta)
-    {
-        if (!plot.isEmpty())
-        {
+    public void render(float delta) {
+        if (!plot.isEmpty()) {
             plot.update();
 
             if (!plot.isEmpty() && plot.isReadyToHarvest())
                 harvestButton.setVisible(true);
+            batch.begin();
+            batch.draw(adult_tree, -240, 265);
+            batch.end();
         }
 
         updateLabels();
@@ -183,8 +199,38 @@ public class PlotScreen implements Screen
             seedImage.setY(y);
         }
 
+        batch.begin();
+        batch.draw(sky, 0, 0, 0, 0, (int) stage.getWidth(), (int) stage.getHeight());
+        batch.draw(grass, 0, 0);
+
+        int centerX = GDX_WIDTH/2;
+
+        batch.draw(dirtplot, centerX - dirtplot.getWidth()/2, 200);
+        batch.draw(dirtpatch, centerX - dirtPatch.getWidth()/2, 165);
+
+        if(!plot.isEmpty()) {
+
+            if (plot.isReadyToHarvest() || plot.isMature())
+            batch.draw(adult_tree, centerX - dirtPatch.getWidth()/2, 165);
+
+            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 4 / 5)))
+                batch.draw(youngAdult_tree, centerX - dirtPatch.getWidth()/2, 165);
+
+            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 3 / 5)))
+                batch.draw(teenager_tree, centerX - dirtPatch.getWidth()/2, 165);
+
+            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 2 / 5)))
+                batch.draw(child_tree, centerX - dirtPatch.getWidth()/2, 165);
+
+            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() / 5)))
+                batch.draw(baby_tree, centerX - dirtPatch.getWidth()/2, 165);
+        }
+
+        batch.end();
+
         stage.act();
         stage.draw();
+
     }
 
     @Override
