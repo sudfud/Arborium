@@ -7,6 +7,8 @@ import com.mygdx.arborium.items.Item;
 import com.mygdx.arborium.items.SeedList;
 
 import java.util.ArrayList;
+import com.mygdx.arborium.Arborium;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,8 +24,32 @@ public class Inventory
         SEED,
         FRUIT
     }
+    public class InventoryItemEntry
+    {
+        Item item;
+        int count;
 
-    public Inventory()
+        public InventoryItemEntry(Item item)
+        {
+            this.item = item;
+            count = 0;
+        }
+
+        public void incCount()
+        {
+            count++;
+        }
+
+        public void decCount()
+        {
+            count--;
+        }
+    }
+
+    int maxCapacity = 50;
+    int inventoryCount = 0;
+
+    public static void initialize()
     {
         json = new Json();
 
@@ -36,6 +62,8 @@ public class Inventory
             inventory = json.fromJson(HashMap.class, serializedInventory);
             Gdx.app.log("Inventory", inventory.keySet().toString());
         }
+        inventory = new HashMap<String, Integer>();
+        pref = Arborium.preferences;
     }
 
     public static void addItem(String itemName, int count)
@@ -53,6 +81,9 @@ public class Inventory
 
         updateInventory();
         Gdx.app.log("Inventory", "" + inventory.get(itemName));
+
+        pref.putInteger("InvCount" + itemName, inventory.get(itemName));
+        pref.flush();
     }
 
     public static void takeItem(String itemName)

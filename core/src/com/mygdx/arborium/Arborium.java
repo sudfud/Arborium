@@ -39,11 +39,13 @@ public class Arborium extends Game
 		Currency.initialize();
 		SeedList.initialize();
 		TreeList.initialize();
+<<<<<<< Updated upstream
 		FruitList.initialize();
+=======
+		Inventory.initialize();
+>>>>>>> Stashed changes
 
 		farm = new Farm();
-
-		Inventory inv = new Inventory();
 
 		farmScreen = new FarmScreen(this);
 
@@ -65,6 +67,7 @@ public class Arborium extends Game
 	{
 		super.render();
 	}
+<<<<<<< Updated upstream
 
     @Override
     public void dispose()
@@ -72,4 +75,6 @@ public class Arborium extends Game
         Resources.dispose();
         spriteBatch.dispose();
     }
+=======
+>>>>>>> Stashed changes
 }

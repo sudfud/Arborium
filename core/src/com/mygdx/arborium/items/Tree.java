@@ -1,8 +1,10 @@
 package com.mygdx.arborium.items;
+import com.mygdx.arborium.items.Item;
 
 public class Tree extends Item
 {
     private int produceAmount;
+    private int maxCapacity;
     private long produceRate;
 
     private long matureTime;
@@ -13,6 +15,7 @@ public class Tree extends Item
     {
         super(id, name);
         this.produceAmount = produceAmount;
+        maxCapacity = this.produceAmount * 5;
         this.produceRate = (long)(produceRateMinutes * 1000 * 60);
         this.matureTime = (long)(matureTimeMinutes * 1000 * 60);
         this.fruit = fruit;
