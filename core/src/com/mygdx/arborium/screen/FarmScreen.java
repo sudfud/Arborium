@@ -47,7 +47,7 @@ public class FarmScreen implements Screen
 
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
         stage.addActor(table);
 
         skin = Resources.glassySkin;

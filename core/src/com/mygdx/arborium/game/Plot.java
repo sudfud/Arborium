@@ -66,7 +66,9 @@ public class Plot
             plantedTime = pref.getLong(plantTimeKey);
 
             if (mature)
-                timeSinceLastHarvest = pref.getLong(harvestKey);
+            {
+                lastHarvestTime = pref.getLong(harvestKey);
+            }
 
             readyToHarvest = false;
         }
@@ -116,14 +118,17 @@ public class Plot
 
     public void harvest()
     {
-        Inventory.addItem(plantedTree.getFruit().itemName, produceAmount);
-        timeSinceLastHarvest = 0;
-        lastHarvestTime = TimeUtils.millis();
-        readyToHarvest = false;
+        if (readyToHarvest)
+        {
+            Inventory.addItem(plantedTree.getFruit().itemName, produceAmount);
+            timeSinceLastHarvest = 0;
+            lastHarvestTime = TimeUtils.millis();
+            readyToHarvest = false;
 
-        String key = "Plot" + plotNumber + "LastHarvest";
-        pref.putLong(key, lastHarvestTime);
-        pref.flush();
+            String key = "Plot" + plotNumber + "LastHarvest";
+            pref.putLong(key, lastHarvestTime);
+            pref.flush();
+        }
     }
 
     public boolean isEmpty()

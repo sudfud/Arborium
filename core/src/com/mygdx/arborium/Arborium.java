@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Farm;
 import com.mygdx.arborium.game.Inventory;
+import com.mygdx.arborium.items.FruitList;
 import com.mygdx.arborium.items.SeedList;
 import com.mygdx.arborium.items.TreeList;
 import com.mygdx.arborium.screen.FarmScreen;
@@ -36,8 +37,9 @@ public class Arborium extends Game
 
 		Resources.initialize();
 		Currency.initialize();
-		TreeList.initialize();
 		SeedList.initialize();
+		TreeList.initialize();
+		FruitList.initialize();
 
 		farm = new Farm();
 

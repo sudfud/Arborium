@@ -54,7 +54,7 @@ public class ShopScreen implements Screen
 
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        // table.setDebug(true);
         stage.addActor(table);
 
         skin = Resources.glassySkin;
@@ -99,7 +99,7 @@ public class ShopScreen implements Screen
                 updateLabels();
             }
         });
-        table.add(itemList).height(500).width(300).center();
+        table.add(itemList).height(750).width(500).center();
         table.row();
 
         priceLabel = new Label("Price: ", skin);
@@ -188,6 +188,12 @@ public class ShopScreen implements Screen
         if (itemList.getItems().size > 0)
         {
             selectedItemName = itemList.getSelected();
+            if (shopSelectBox.getSelected().equals("Sell"))
+            {
+                int cutoff = selectedItemName.indexOf(':');
+                if (cutoff != -1)
+                    selectedItemName = selectedItemName.substring(0, cutoff);
+            }
             ShopItem item = (ShopItem) Item.lookup(selectedItemName);
 
             if (shopSelectBox.getSelected().equals("Buy"))
@@ -200,10 +206,19 @@ public class ShopScreen implements Screen
             int currency = Currency.getAmount();
             currencyLabel.setText("Currency: " + currency);
 
-            if (shopSelectBox.getSelected().equals("Buy")) {
+            if (shopSelectBox.getSelected().equals("Buy"))
+            {
                 itemList.setItems(SeedList.getSeedNames());
-            } else {
-                itemList.setItems(Inventory.getItems());
+            }
+            else
+            {
+                String[] itemNames = Inventory.getItems();
+                for (int i = 0; i < itemNames.length; i++)
+                {
+                    int count = Inventory.getCount(itemNames[i]);
+                    itemNames[i] = itemNames[i] + (": x" + count);
+                }
+                itemList.setItems(itemNames);
             }
         }
     }

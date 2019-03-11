@@ -8,8 +8,8 @@ public class FruitList
 {
     private static HashMap<String, Fruit> fruitMap;
 
-    public static Fruit apple = new Fruit(64, "Apple Fruit", Resources.appleFruit, -1, 500);
-    public static Fruit orange = new Fruit(65, "Orange Fruit", Resources.orangeFruit, -1, 750);
+    public static Fruit apple = new Fruit(64, "Apple Fruit", Resources.appleFruit, -1, 10);
+    public static Fruit orange = new Fruit(65, "Orange Fruit", Resources.orangeFruit, -1, 25);
 
     public static void initialize()
     {

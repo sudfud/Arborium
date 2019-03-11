@@ -48,6 +48,7 @@ public class PlotScreen implements Screen
     Stack stack;
     Table table;
 
+    Label plantedTreeLabel;
     Label timer;
 
     Skin skin;
@@ -80,11 +81,17 @@ public class PlotScreen implements Screen
 
         table = new Table();
         table.setFillParent(true);
-        //table.setDebug(true);
+        // table.setDebug(true);
         stack.add(table);
         stack.setDebug(true);
 
         skin = Resources.glassySkin;
+
+        plantedTreeLabel = new Label("", skin);
+        plantedTreeLabel.setAlignment(Align.center);
+        plantedTreeLabel.setFontScale(2);
+        table.add(plantedTreeLabel).width(500);
+        table.row();
 
         timer = new Label("", skin);
         timer.setAlignment(Align.center);
@@ -197,6 +204,13 @@ public class PlotScreen implements Screen
             }
 
             seedImage.setY(y);
+        }
+
+        float shakeAmt = Math.abs(Gdx.input.getAccelerometerX());
+        Gdx.app.log("PlotScreen", "AccelerometerX (abs): " + shakeAmt);
+        if (plot.isMature() && shakeAmt >= 25f)
+        {
+            plot.harvest();
         }
 
         batch.begin();
@@ -382,6 +396,7 @@ public class PlotScreen implements Screen
         if (!plot.isEmpty())
         {
             Tree tree = plot.getPlantedTree();
+            plantedTreeLabel.setText("Currently planted: " + tree.itemName);
             if (plot.isReadyToHarvest())
             {
                 timer.setText("Ready to harvest");
@@ -406,6 +421,7 @@ public class PlotScreen implements Screen
         }
         else
         {
+            plantedTreeLabel.setText("Currently planted: None");
             timer.setText("");
         }
     }

@@ -76,6 +76,11 @@ public class Inventory
         return inventory.containsKey(item);
     }
 
+    public static int getCount(String name)
+    {
+        return inventory.get(name);
+    }
+
     public static String[] getItems()
     {
         return inventory.keySet().toArray(new String[inventory.size()]);
