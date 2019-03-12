@@ -16,34 +16,13 @@ public class Inventory
 {
     private static HashMap<String, Integer> inventory;
 
-    private static Preferences pref = Gdx.app.getPreferences("Arborium Inventory");
+    private static Preferences pref = Arborium.preferences;
     private static Json json;
 
     public enum InventoryCategory
     {
         SEED,
         FRUIT
-    }
-    public class InventoryItemEntry
-    {
-        Item item;
-        int count;
-
-        public InventoryItemEntry(Item item)
-        {
-            this.item = item;
-            count = 0;
-        }
-
-        public void incCount()
-        {
-            count++;
-        }
-
-        public void decCount()
-        {
-            count--;
-        }
     }
 
     int maxCapacity = 50;
@@ -52,6 +31,7 @@ public class Inventory
     public static void initialize()
     {
         json = new Json();
+        Gdx.app.log("Inventory", pref.get().toString());
 
         if (!pref.contains("Inventory"))
             inventory = new HashMap<String, Integer>();
@@ -62,7 +42,6 @@ public class Inventory
             inventory = json.fromJson(HashMap.class, serializedInventory);
             Gdx.app.log("Inventory", inventory.keySet().toString());
         }
-        inventory = new HashMap<String, Integer>();
         pref = Arborium.preferences;
     }
 
@@ -80,10 +59,6 @@ public class Inventory
         }
 
         updateInventory();
-        Gdx.app.log("Inventory", "" + inventory.get(itemName));
-
-        pref.putInteger("InvCount" + itemName, inventory.get(itemName));
-        pref.flush();
     }
 
     public static void takeItem(String itemName)
@@ -96,10 +71,7 @@ public class Inventory
             else
                 inventory.put(itemName, amt - 1);
         }
-        Gdx.app.log("Inventory", "AAAAAAA" + inventory.get(itemName));
-        String serialized = json.toJson(inventory);
-        pref.putString("Inventory", serialized);
-        pref.flush();
+        updateInventory();
     }
 
     public static boolean containsItem(Item item)
