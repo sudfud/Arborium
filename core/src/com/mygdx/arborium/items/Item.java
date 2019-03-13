@@ -1,5 +1,6 @@
 package com.mygdx.arborium.items;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Item
@@ -40,5 +41,22 @@ public abstract class Item
     public static Item lookup(String name)
     {
         return itemLookup.get(name);
+    }
+
+    public static String[] getItemsOfType(Class<?> type)
+    {
+        String[] allItems = itemLookup.keySet().toArray(new String[itemLookup.size()]);
+        ArrayList<String> matchingItems = new ArrayList<String>();
+
+        for (String key : allItems)
+        {
+            Item item = lookup(key);
+            if (type.isInstance(item))
+            {
+                matchingItems.add(key);
+            }
+        }
+
+        return matchingItems.toArray(new String[matchingItems.size()]);
     }
 }

@@ -21,7 +21,10 @@ import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.items.Item;
+import com.mygdx.arborium.items.Seed;
 import com.mygdx.arborium.items.ShopItem;
+
+import java.util.ArrayList;
 
 public class ShopScreen implements Screen
 {
@@ -221,16 +224,14 @@ public class ShopScreen implements Screen
 
             if (shopSelectBox.getSelected().equals("Buy"))
             {
-                itemList.setItems(game.seedList.getSeedNames());
+                String[] shopItems = Item.getItemsOfType(Seed.class);
+                ArrayList<String> buyableItems = new ArrayList<String>();
+
+                itemList.setItems(shopItems);
             }
             else
             {
-                String[] itemNames = Inventory.getItems();
-                for (int i = 0; i < itemNames.length; i++)
-                {
-                    int count = Inventory.getCount(itemNames[i]);
-                    itemNames[i] = itemNames[i] + (": x" + count);
-                }
+                String[] itemNames = Inventory.getItemsOfType(ShopItem.class);
                 itemList.setItems(itemNames);
             }
         }
