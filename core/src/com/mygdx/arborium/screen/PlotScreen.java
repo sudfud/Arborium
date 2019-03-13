@@ -26,7 +26,6 @@ import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.game.Plot;
 import com.mygdx.arborium.items.Seed;
-import com.mygdx.arborium.items.SeedList;
 import com.mygdx.arborium.items.Tree;
 
 import java.util.Random;
@@ -62,8 +61,12 @@ public class PlotScreen implements Screen
     Image seedImage;
     private boolean seedTouched = false;
     private SpriteBatch batch;
-    private Texture sky, grass, dirtplot, dirtpatch, adult_tree,
+    private Texture sky, dirtplot, dirtpatch, adult_tree,
     youngAdult_tree, teenager_tree, child_tree, baby_tree;
+
+    Texture background;
+    Texture grass;
+    Texture dirt;
 
     Random random;
     private boolean fruitDrawn = false;
@@ -73,32 +76,35 @@ public class PlotScreen implements Screen
     {
         this.game = game;
         stage = new Stage(new ScreenViewport());
-        stage.addActor(Resources.backgroundImage);
         this.plot = plot;
 
+        // Setup Stack and add to stage
         stack = new Stack();
         stack.setFillParent(true);
         stage.addActor(stack);
 
+        // Setup main table and add to stack
         table = new Table();
         table.setFillParent(true);
         stack.add(table);
         stack.setDebug(true);
 
-        skin = Resources.glassySkin;
+        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
 
+        // Setup tree label, add to table
         plantedTreeLabel = new Label("", skin);
         plantedTreeLabel.setAlignment(Align.center);
         plantedTreeLabel.setFontScale(2);
         table.add(plantedTreeLabel).width(500);
         table.row();
 
+        // Setup mature/harvest timer, add to main table.
         timer = new Label("", skin);
         timer.setAlignment(Align.center);
         timer.setFontScale(2);
-
         table.add(timer).width(500).expandX().center().space(25);
 
+        // Setup seed selection table, added to stack later
         seedSelectTable = new Table();
         seedSelectTable.setFillParent(true);
 
@@ -107,7 +113,10 @@ public class PlotScreen implements Screen
         seedSelectScrollPane = new ScrollPane(seedSelectList, skin);
         seedSelectTable.add(seedSelectScrollPane).size(250, 500);
 
-        seedImage = new Image(Resources.seed2);
+        // Setup a dummy seed image, to be modified later when the user selects a
+        // seed to plant
+        Texture seedTexture = game.resources.getTexture(Resources.APPLE_SEED);
+        seedImage = new Image(seedTexture);
         seedImage.addListener(new ClickListener()
         {
             @Override
@@ -117,6 +126,7 @@ public class PlotScreen implements Screen
                 return true;
             }
 
+            // Send the seed image to its original position
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
@@ -139,7 +149,7 @@ public class PlotScreen implements Screen
         Gdx.app.log("PlotScreen", "show()");
         Gdx.app.log("PlotScreen", "plot empty: " + plot.isEmpty());
 
-        seedSelectList.setItems(Inventory.getItems(Inventory.InventoryCategory.SEED));
+        seedSelectList.setItems(Inventory.getItemsOfType(Seed.class));
         Gdx.app.log("PlotScreen", "" + seedSelectList.getItems().size);
 
         addButtonListeners();
@@ -150,21 +160,24 @@ public class PlotScreen implements Screen
 
         Gdx.input.setInputProcessor(stage);
 
-        batch = new SpriteBatch();
-        sky = new Texture(Gdx.files.internal("background_sky.png"));
-        grass = new Texture(Gdx.files.internal("grass.png"));
-        dirtplot = new Texture(Gdx.files.internal("dirtplot.png"));
-        dirtpatch = new Texture(Gdx.files.internal("dirtpatch.png"));
-        adult_tree = new Texture(Gdx.files.internal("tree1_adult.png"));
-        youngAdult_tree = new Texture(Gdx.files.internal("tree1_youngadult.png"));
-        teenager_tree = new Texture(Gdx.files.internal("tree1_teenager.png"));
-        child_tree = new Texture(Gdx.files.internal("tree1_child.png"));
-        baby_tree = new Texture(Gdx.files.internal("tree1_baby.png"));
+        batch = game.spriteBatch;
+
+        // Grab all the textures needed from the game's resource manager
+        sky = game.resources.getTexture(Resources.BG_SKY);
+        grass = game.resources.getTexture(Resources.GRASS);
+        dirtplot = game.resources.getTexture(Resources.DIRT_PLOT);
+        dirtpatch = game.resources.getTexture(Resources.DIRT_PATCH);
+        adult_tree = game.resources.getTexture(Resources.TREE_1_ADULT);
+        youngAdult_tree = game.resources.getTexture(Resources.TREE_1_YOUNG_ADULT);
+        teenager_tree = game.resources.getTexture(Resources.TREE_1_TEENAGER);
+        child_tree = game.resources.getTexture(Resources.TREE_1_CHILD);
+        baby_tree = game.resources.getTexture(Resources.TREE_1_BABY);
     }
 
     @Override
     public void render(float delta)
     {
+        // Update the plot if it's not currently empty
         if (!plot.isEmpty())
         {
             plot.update();
@@ -172,33 +185,28 @@ public class PlotScreen implements Screen
             if (!plot.isEmpty() && plot.isReadyToHarvest())
                 harvestButton.setVisible(true);
             batch.begin();
-            batch.draw(adult_tree, -240, 265);
+            //batch.draw(adult_tree, -240, 265);
             batch.end();
         }
 
         updateLabels();
 
+        // Clear screen
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.spriteBatch.begin();
-        Texture background = Resources.backgroundTexture;
-        Texture grass = Resources.grassTexture;
-        Texture dirtPatch = Resources.dirtPatchTexture;
-        game.spriteBatch.draw(background, -background.getWidth()/2, 0);
-        game.spriteBatch.draw(grass, 0, -grass.getHeight()/4);
-        game.spriteBatch.draw(dirtPatch, Gdx.graphics.getWidth()/2 - dirtPatch.getWidth()/2, 200);
-        game.spriteBatch.end();
-
+        // This should only be true if there's currently a seed selected to plant
         if (seedTouched)
         {
             int y = GDX_HEIGHT - Gdx.input.getY();
 
+            // If the seed is currently on or under the bottom quarter of
+            // the screen, plant the seed and bring back the main table
             if (y <= 200)
             {
                 seedImage.setVisible(false);
                 String seedName = seedSelectList.getSelected();
-                Seed seed = SeedList.get(seedName);
+                Seed seed = game.seedList.get(seedName);
                 plot.plantSeed(seed.treeType);
                 Inventory.takeItem(seedName);
                 stack.add(table);
@@ -207,26 +215,30 @@ public class PlotScreen implements Screen
                 seedTouched = false;
             }
 
+            // Set the seed's y position to where the screen was touched
             seedImage.setY(y);
         }
 
-        float shakeAmt = Math.abs(Gdx.input.getAccelerometerX());
-        Gdx.app.log("PlotScreen", "AccelerometerX (abs): " + shakeAmt);
         if (plot.isReadyToHarvest())
         {
+            // If the fruit has not already been drawn, draw it so that the
+            // correct # of fruits appear on the tree
             if (!fruitDrawn)
             {
                 fruitPositions = new Vector2[plot.getPlantedTree().getProduceAmount()];
                 for (int i = 0; i < fruitPositions.length; i++)
                 {
-                    int x = random.nextInt(GDX_WIDTH + GDX_WIDTH/2) - GDX_WIDTH/2;
-                    int y = random.nextInt(GDX_HEIGHT/2) + GDX_HEIGHT/2;
+                    int x = random.nextInt(GDX_WIDTH) - 100;
+                    int y = random.nextInt(GDX_HEIGHT/2) + GDX_HEIGHT/2 - 100;
 
-                    fruitPositions[i] = new Vector2(0, y);
+                    fruitPositions[i] = new Vector2(x, y);
                 }
                 fruitDrawn = true;
             }
 
+            // Harvest the tree and stop drawing the fruit when the phone
+            // is shaken.
+            float shakeAmt = Math.abs(Gdx.input.getAccelerometerX());
             if (shakeAmt >= 25)
             {
                 plot.harvest();
@@ -235,32 +247,36 @@ public class PlotScreen implements Screen
         }
 
         batch.begin();
+
+        // Draw the static (unchanging) textures
         batch.draw(sky, 0, 0, 0, 0, (int) stage.getWidth(), (int) stage.getHeight());
         batch.draw(grass, 0, 0);
 
         int centerX = GDX_WIDTH/2;
-
         batch.draw(dirtplot, centerX - dirtplot.getWidth()/2, 200);
-        batch.draw(dirtpatch, centerX - dirtPatch.getWidth()/2, 165);
+        batch.draw(dirtpatch, centerX - dirtpatch.getWidth()/2, 165);
 
+        // If the plot has a tree, draw it based on how long the tree has
+        // to wait to mature.
         if (!plot.isEmpty())
         {
             if (plot.isReadyToHarvest() || plot.isMature())
-            batch.draw(adult_tree, centerX - dirtPatch.getWidth()/2, 165);
+            batch.draw(adult_tree, centerX - dirtpatch.getWidth()/2, 165);
 
             else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 4 / 5)))
-                batch.draw(youngAdult_tree, centerX - dirtPatch.getWidth()/2, 165);
+                batch.draw(youngAdult_tree, centerX - dirtpatch.getWidth()/2, 165);
 
             else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 3 / 5)))
-                batch.draw(teenager_tree, centerX - dirtPatch.getWidth()/2, 165);
+                batch.draw(teenager_tree, centerX - dirtpatch.getWidth()/2, 165);
 
             else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 2 / 5)))
-                batch.draw(child_tree, centerX - dirtPatch.getWidth()/2, 165);
+                batch.draw(child_tree, centerX - dirtpatch.getWidth()/2, 165);
 
             else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() / 5)))
-                batch.draw(baby_tree, centerX - dirtPatch.getWidth()/2, 165);
+                batch.draw(baby_tree, centerX - dirtpatch.getWidth()/2, 165);
         }
 
+        // Draw the fruits
         if (fruitDrawn)
         {
             Texture fruitTexture = plot.getPlantedTree().getFruit().itemImage;
@@ -272,12 +288,11 @@ public class PlotScreen implements Screen
                 batch.draw(fruitTexture, x, y, 100, 100);
             }
         }
-
         batch.end();
 
+        // Update and draw stage
         stage.act();
         stage.draw();
-
     }
 
     @Override
@@ -399,9 +414,9 @@ public class PlotScreen implements Screen
                     stack.removeActor(seedSelectTable);
                     stack.removeActor(table);
                     String seedName = seedSelectList.getSelected();
-                    Seed seed = SeedList.get(seedName);
+                    Seed seed = game.seedList.get(seedName);
                     seedImage.setDrawable(new TextureRegionDrawable(seed.itemImage));
-                    seedImage.setScale(0.5f);
+                    seedImage.setSize(100, 100);
                     seedImage.setPosition(GDX_WIDTH / 2 - seedImage.getWidth() / 4, GDX_HEIGHT * 3 / 4);
                     seedImage.setVisible(true);
                     stage.addActor(seedImage);
@@ -430,6 +445,8 @@ public class PlotScreen implements Screen
         {
             Tree tree = plot.getPlantedTree();
             plantedTreeLabel.setText("Currently planted: " + tree.itemName);
+
+            // Set timer text based on the current state of the plot/tree.
             if (plot.isReadyToHarvest())
             {
                 timer.setText("Ready to harvest");
@@ -459,6 +476,7 @@ public class PlotScreen implements Screen
         }
     }
 
+    // Use this to convert time in milliseconds to a more human-readable format
     private String timeFormat(long millis)
     {
         return String.format("%02d:%02d:%02d",

@@ -1,14 +1,16 @@
 package com.mygdx.arborium.game;
 
+import com.mygdx.arborium.Arborium;
+
 public class Farm
 {
     Plot[] plots;
 
-    public Farm()
+    public Farm(Arborium game)
     {
         plots = new Plot[9];
         for (int i = 0; i < plots.length; i++)
-            plots[i] = new Plot(i);
+            plots[i] = new Plot(i, game);
     }
 
     public void update()

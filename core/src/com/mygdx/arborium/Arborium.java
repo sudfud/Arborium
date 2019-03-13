@@ -21,6 +21,12 @@ public class Arborium extends Game
 
 	public SpriteBatch spriteBatch;
 
+	public Resources resources;
+
+	public FruitList fruitList;
+	public TreeList treeList;
+	public SeedList seedList;
+
 	public FarmScreen farmScreen;
 	public PlotScreen[] plotScreens;
 	public MainMenuScreen mainMenuScreen;
@@ -35,14 +41,18 @@ public class Arborium extends Game
 
 		spriteBatch = new SpriteBatch();
 
-		Resources.initialize();
-		Currency.initialize();
-		SeedList.initialize();
-		TreeList.initialize();
-		FruitList.initialize();
-		Inventory.initialize();
+		resources = new Resources();
 
-		farm = new Farm();
+		// fruitList should be initialized first and seedList last.
+		// treeList depends on fruitList and seedList depends on treeList.
+		fruitList = new FruitList(this);
+		treeList = new TreeList(this);
+		seedList = new SeedList(this);
+
+		Currency.initialize();
+		Inventory.initialize(this);
+
+		farm = new Farm(this);
 
 		farmScreen = new FarmScreen(this);
 
@@ -68,7 +78,15 @@ public class Arborium extends Game
     @Override
     public void dispose()
     {
-        Resources.dispose();
+    	resources.dispose();
         spriteBatch.dispose();
+
+        mainMenuScreen.dispose();
+        shopScreen.dispose();
+		farmScreen.dispose();
+		for (int i = 0; i < plotScreens.length; i++)
+		{
+			plotScreens[i].dispose();
+		}
     }
 }

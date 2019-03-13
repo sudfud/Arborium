@@ -1,37 +1,41 @@
 package com.mygdx.arborium.items;
 
-import com.mygdx.arborium.Resources;
+import com.badlogic.gdx.graphics.Texture;
+import com.mygdx.arborium.Arborium;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class SeedList
 {
-    private static HashMap<String, Seed> seedMap;
+    private HashMap<String, Seed> seedMap;
 
-    public static final Seed apple = new Seed(128, "Apple Seed", Resources.seed2, 100, 100 * 3/4, false, TreeList.appleTree);
-    public static final Seed orange = new Seed(129, "Orange Seed", Resources.seed3, 250, 250 * 3/4, false, TreeList.orangeTree);
+    public final Seed apple;
+    public final Seed orange;
 
-    public static String[] seedNames = { apple.itemName, orange.itemName };
-
-    public static void initialize()
+    public SeedList(Arborium game)
     {
+        Texture appleSeedTexture = game.resources.getTexture("seed2.png");
+        Texture orangeSeedTexture = game.resources.getTexture("seed3.png");
+
+        apple = new Seed(128, "Apple Seed", appleSeedTexture, 100, 100 * 3/4, false, game.treeList.appleTree);
+        orange = new Seed(129, "Orange Seed", orangeSeedTexture, 250, 250 * 3/4, false, game.treeList.orangeTree);
+
         seedMap = new HashMap<String, Seed>();
         seedMap.put(apple.itemName, apple);
         seedMap.put(orange.itemName, orange);
     }
 
-    public static Seed get(String name)
+    public Seed get(String name)
     {
         return seedMap.get(name);
     }
 
-    public static Seed[] getAllSeeds()
+    public Seed[] getAllSeeds()
     {
         return seedMap.values().toArray(new Seed[seedMap.size()]);
     }
 
-    public static String[] getSeedNames()
+    public String[] getSeedNames()
     {
         return seedMap.keySet().toArray(new String[seedMap.size()]);
     }

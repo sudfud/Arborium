@@ -8,6 +8,8 @@ import com.mygdx.arborium.items.TreeList;
 
 public class Plot
 {
+    private Arborium game;
+
     private Preferences pref = Arborium.preferences;
     String plantTimeKey;
     String harvestKey;
@@ -35,9 +37,10 @@ public class Plot
 
     Tree plantedTree;
 
-    public Plot(int num)
+    public Plot(int num, Arborium game)
     {
         plotNumber = num;
+        this.game = game;
 
         plantTimeKey = "Plot" + num + "PlantTime";
         harvestKey = "Plot" + num + "LastHarvest";
@@ -56,7 +59,7 @@ public class Plot
         else
         {
             String treeType = pref.getString(treeKey);
-            plantedTree = TreeList.get(treeType);
+            plantedTree = game.treeList.get(treeType);
             matureTime = plantedTree.getMatureTime();
             produceRate = plantedTree.getProduceRate();
             produceAmount = plantedTree.getProduceAmount();

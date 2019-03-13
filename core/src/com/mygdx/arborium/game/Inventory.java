@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import com.mygdx.arborium.Arborium;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 
 public class Inventory
 {
+    private static Arborium game;
+
     private static HashMap<String, Integer> inventory;
 
     private static Preferences pref = Arborium.preferences;
@@ -28,8 +30,10 @@ public class Inventory
     int maxCapacity = 50;
     int inventoryCount = 0;
 
-    public static void initialize()
+    public static void initialize(Arborium g)
     {
+        game = g;
+
         json = new Json();
         Gdx.app.log("Inventory", pref.get().toString());
 
@@ -89,6 +93,20 @@ public class Inventory
         return inventory.keySet().toArray(new String[inventory.size()]);
     }
 
+    public static String[] getItemsOfType(Class<?> type)
+    {
+        String[] keys = inventory.keySet().toArray(new String[inventory.size()]);
+        ArrayList<String> matchingKeys = new ArrayList<String>();
+        for (String key : keys)
+        {
+            if (type.isInstance(Item.lookup(key)))
+            {
+                matchingKeys.add(key);
+            }
+        }
+        return matchingKeys.toArray(new String[matchingKeys.size()]);
+    }
+
     public static String[] getItems(InventoryCategory cat)
     {
         ArrayList<String> records = new ArrayList<String>();
@@ -96,7 +114,7 @@ public class Inventory
         switch(cat)
         {
             case SEED:
-                for (String seed : SeedList.getSeedNames())
+                for (String seed : game.seedList.getSeedNames())
                 {
                     if (inventory.containsKey(seed))
                         records.add(seed);

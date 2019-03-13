@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -41,16 +39,15 @@ public class FarmScreen implements Screen
     {
         this.game = game;
         stage = new Stage(new ScreenViewport());
-        stage.addActor(Resources.backgroundImage);
 
         farm = game.farm;
 
+        // Setup table
         table = new Table();
         table.setFillParent(true);
-        // table.setDebug(true);
         stage.addActor(table);
 
-        skin = Resources.glassySkin;
+        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
 
         testHarvestButtons = new TextButton[9];
         initializeButtons();
@@ -61,10 +58,10 @@ public class FarmScreen implements Screen
     {
         Gdx.input.setInputProcessor(stage);
 
-        batch = new SpriteBatch();
-        sky = new Texture(Gdx.files.internal("background_sky.png"));
-        grass = new Texture(Gdx.files.internal("grass.png"));
-        dirtplot = new Texture(Gdx.files.internal("dirtplot.png"));
+        // Grab needed textures from the game's resource manager.
+        sky = game.resources.getTexture(Resources.BG_SKY);
+        grass = game.resources.getTexture(Resources.GRASS);
+        dirtplot = game.resources.getTexture(Resources.DIRT_PLOT);
     }
 
     @Override
@@ -72,6 +69,7 @@ public class FarmScreen implements Screen
     {
         farm.update();
 
+        // Update labels for the plot buttons
         for (int i = 0; i < farm.getPlotSize(); i++)
         {
             String buttonText = "Plot " + i;
@@ -80,27 +78,35 @@ public class FarmScreen implements Screen
                 buttonText += "\nEmpty";
 
             testHarvestButtons[i].setText(buttonText);
-            batch.begin();
-            batch.draw(dirtplot, testHarvestButtons[i].getX(), testHarvestButtons[i].getY());
-            batch.end();
+            //batch.begin();
+            //batch.draw(dirtplot, testHarvestButtons[i].getX(), testHarvestButtons[i].getY());
+            //batch.end();
         }
 
+
+        // Clear screen
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.spriteBatch.begin();
-        Texture background = Resources.backgroundTexture;
-        game.spriteBatch.draw(Resources.backgroundTexture, - background.getWidth()/2, 0);
-        game.spriteBatch.end();
 
-        batch.begin();
-        batch.draw(grass, 0, 0, 0, 0, (int)stage.getWidth() , (int)stage.getHeight()*2);
+        // Draw background
+        game.spriteBatch.begin();
+        game.spriteBatch.draw(sky,0, 0);
+
+
+        // Draw grass
+        game.spriteBatch.draw(grass, 0, 0, 0, 0, (int)stage.getWidth() , (int)stage.getHeight()*2);
+
+
+        // Draw dirt plots for each plot on screen
         for (int i = 0; i < farm.getPlotSize(); i++)
         {
-            batch.draw(dirtplot, testHarvestButtons[i].getX() - dirtplot.getWidth()/2, testHarvestButtons[i].getY() - dirtplot.getWidth()/2);
+            game.spriteBatch.draw(dirtplot, testHarvestButtons[i].getX() - dirtplot.getWidth()/2, testHarvestButtons[i].getY() - dirtplot.getWidth()/2);
         }
-        batch.end();
+        game.spriteBatch.end();
 
+
+        // Update and draw UI
         stage.act();
         stage.draw();
     }
@@ -172,6 +178,8 @@ public class FarmScreen implements Screen
             testHarvestButtons[i] = button;
         }
 
+
+        // Setup main menu button
         mainMenuButton = new TextButton("Menu", skin);
         mainMenuButton.addListener(new ClickListener()
         {
@@ -182,10 +190,11 @@ public class FarmScreen implements Screen
                 return true;
             }
         });
-
         table.row();
         table.add(mainMenuButton).bottom().width(150).height(100);
 
+
+        // Setup shop button
         shopButton = new TextButton("Shop", skin);
         shopButton.addListener(new ClickListener()
         {
@@ -196,7 +205,6 @@ public class FarmScreen implements Screen
                return true;
            }
         });
-
         table.add();
         table.add(shopButton).width(150).height(100);
     }

@@ -30,18 +30,23 @@ public class MainMenuScreen implements Screen
     TextButton optionButton;
     TextButton quitButton;
 
+    Texture background;
+
     public MainMenuScreen(Arborium game)
     {
         this.game = game;
 
-        skin = Resources.glassySkin;
+        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
         skin.getFont("font-big").getData().setScale(0.75f);
 
+        // Setup stage and table
         stage = new Stage(new ScreenViewport());
         table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
 
+
+        // Setup start button
         startButton = new TextButton("Start", skin);
         startButton.addListener(new ClickListener()
         {
@@ -54,6 +59,8 @@ public class MainMenuScreen implements Screen
         });
         table.add(startButton).width(200).height(100).space(50);
 
+
+        // Setup quit button
         quitButton = new TextButton("Exit", skin);
         quitButton.addListener(new ClickListener()
         {
@@ -66,6 +73,8 @@ public class MainMenuScreen implements Screen
         });
         table.row();
         table.add(quitButton).width(200).height(100);
+
+        background = game.resources.getTexture(Resources.BG_SKY);
     }
 
     @Override
@@ -77,15 +86,16 @@ public class MainMenuScreen implements Screen
     @Override
     public void render(float delta)
     {
+        // Clear screen
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // Draw background
         game.spriteBatch.begin();
-        Texture background = Resources.backgroundTexture;
-        Texture dirt = Resources.dirtPatchTexture;
-        game.spriteBatch.draw(Resources.backgroundTexture, - background.getWidth()/2, 0);
+        game.spriteBatch.draw(background, 0, 0);
         game.spriteBatch.end();
 
+        // Update and draw UI
         stage.act();
         stage.draw();
     }

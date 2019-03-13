@@ -1,40 +1,73 @@
 package com.mygdx.arborium;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class Resources
 {
-    public static Skin glassySkin = new Skin(Gdx.files.internal("glassy-ui.json"));
+    public AssetManager assetManager;
 
-    public static Texture backgroundTexture = new Texture(Gdx.files.internal("background_sky.png"));
-    public static Texture grassTexture = new Texture(Gdx.files.internal("grass.png"));
-    public static Texture dirtPatchTexture = new Texture(Gdx.files.internal("dirtpatch.png"));
+    public static final String GLASSY_SKIN = "glassy-ui.json";
 
-    public static Texture seed1 = new Texture(Gdx.files.internal("seed1.png"));
-    public static Texture seed2 = new Texture(Gdx.files.internal("seed2.png"));
-    public static Texture seed3 = new Texture(Gdx.files.internal("seed3.png"));
+    public static final String BG_SKY = "background_sky.png";
+    public static final String GRASS = "grass.png";
+    public static final String DIRT_PATCH = "dirtpatch.png";
+    public static final String DIRT_PLOT = "dirtplot.png";
 
-    public static Texture appleFruit = new Texture(Gdx.files.internal("fruits/red-apple.png"));
-    public static Texture orangeFruit = new Texture(Gdx.files.internal("fruits/orange.png"));
+    public static final String TREE_1_ADULT = "tree1_adult.png";
+    public static final String TREE_1_YOUNG_ADULT = "tree1_youngadult.png";
+    public static final String TREE_1_TEENAGER = "tree1_teenager.png";
+    public static final String TREE_1_CHILD = "tree1_child.png";
+    public static final String TREE_1_BABY = "tree1_baby.png";
 
-    public static Image backgroundImage = new Image(backgroundTexture);
+    public static final String APPLE_SEED = "seed1.png";
+    public static final String ORANGE_SEED = "seed2.png";
 
-    public static void initialize()
+    public static final String APPLE_FRUIT = "fruits/red-apple.png";
+    public static final String ORANGE_FRUIT = "fruits/orange.png";
+
+    public Resources()
     {
-        backgroundImage.setZIndex(0);
+        assetManager = new AssetManager();
 
-        glassySkin.getFont("font-big").getData().setScale(0.75f);
-        glassySkin.getFont("font").getData().setScale(2);
+        assetManager.load(GLASSY_SKIN, Skin.class);
+
+        assetManager.load(BG_SKY, Texture.class);
+        assetManager.load(GRASS, Texture.class);
+        assetManager.load(DIRT_PATCH, Texture.class);
+        assetManager.load(DIRT_PLOT, Texture.class);
+
+        assetManager.load(TREE_1_ADULT, Texture.class);
+        assetManager.load(TREE_1_YOUNG_ADULT, Texture.class);
+        assetManager.load(TREE_1_TEENAGER, Texture.class);
+        assetManager.load(TREE_1_CHILD, Texture.class);
+        assetManager.load(TREE_1_BABY, Texture.class);
+
+        assetManager.load(APPLE_SEED, Texture.class);
+        assetManager.load(ORANGE_SEED, Texture.class);
+        assetManager.load("seed3.png", Texture.class);
+
+        assetManager.load(APPLE_FRUIT, Texture.class);
+        assetManager.load(ORANGE_FRUIT, Texture.class);
+
+        assetManager.finishLoading();
     }
 
-    public static void dispose()
+    public Skin getSkin(String fileName)
     {
-        backgroundTexture.dispose();
-        grassTexture.dispose();
-        dirtPatchTexture.dispose();
-        glassySkin.dispose();
+        return assetManager.get(fileName, Skin.class);
+    }
+
+    public Texture getTexture(String fileName)
+    {
+        return assetManager.get(fileName, Texture.class);
+    }
+
+    public void dispose()
+    {
+        assetManager.dispose();
     }
 }

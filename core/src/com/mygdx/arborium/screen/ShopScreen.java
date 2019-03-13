@@ -3,6 +3,7 @@ package com.mygdx.arborium.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,7 +21,6 @@ import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.items.Item;
-import com.mygdx.arborium.items.SeedList;
 import com.mygdx.arborium.items.ShopItem;
 
 public class ShopScreen implements Screen
@@ -45,20 +45,22 @@ public class ShopScreen implements Screen
     Stage stage;
     Skin skin;
 
+    Texture background;
+
     public ShopScreen(Arborium game)
     {
         this.game = game;
 
         stage = new Stage(new ScreenViewport());
-        stage.addActor(Resources.backgroundImage);
 
         table = new Table();
         table.setFillParent(true);
         // table.setDebug(true);
         stage.addActor(table);
 
-        skin = Resources.glassySkin;
+        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
 
+        // Set up selection box for buying and selling items (maybe easier to split the two?)
         shopSelectBox = new SelectBox(skin);
         shopSelectBox.setItems("Buy", "Sell");
         shopSelectBox.setSelected("Buy");
@@ -68,7 +70,7 @@ public class ShopScreen implements Screen
             {
                 if (shopSelectBox.getSelected().equals("Buy"))
                 {
-                    itemList.setItems(SeedList.getSeedNames());
+                    setBuyItems();
                 }
                 else
                 {
@@ -82,6 +84,7 @@ public class ShopScreen implements Screen
         table.add(shopSelectBox).width(200);
         table.row();
 
+        // Set up label to show current currency amt
         String currentCurrency = "Currency: " + Currency.getAmount();
         currencyLabel = new Label(currentCurrency, skin);
         currencyLabel.setFontScale(2);
@@ -91,7 +94,7 @@ public class ShopScreen implements Screen
         itemList = new List<String>(skin);
         itemList.getStyle().selection.setTopHeight(16);
         itemList.getStyle().selection.setBottomHeight(16);
-        itemList.setItems(SeedList.getSeedNames());
+        itemList.setItems(game.seedList.getSeedNames());
         itemList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor)
@@ -141,6 +144,8 @@ public class ShopScreen implements Screen
         });
         table.row();
         table.add(backButton);
+
+        background = game.resources.getTexture(Resources.BG_SKY);
     }
 
     @Override
@@ -152,8 +157,16 @@ public class ShopScreen implements Screen
     @Override
     public void render(float delta)
     {
+        // Clear screen
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Draw Background
+        game.spriteBatch.begin();
+        game.spriteBatch.draw(background, 0, 0);
+        game.spriteBatch.end();
+
+        // Draw UI stuff
         stage.act();
         stage.draw();
     }
@@ -208,7 +221,7 @@ public class ShopScreen implements Screen
 
             if (shopSelectBox.getSelected().equals("Buy"))
             {
-                itemList.setItems(SeedList.getSeedNames());
+                itemList.setItems(game.seedList.getSeedNames());
             }
             else
             {
@@ -221,6 +234,16 @@ public class ShopScreen implements Screen
                 itemList.setItems(itemNames);
             }
         }
+    }
+
+    private void setBuyItems()
+    {
+        itemList.setItems(game.seedList.getSeedNames());
+    }
+
+    private void setSellItems()
+    {
+
     }
 
     private void back()
