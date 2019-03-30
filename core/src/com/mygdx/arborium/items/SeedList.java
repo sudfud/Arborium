@@ -2,6 +2,7 @@ package com.mygdx.arborium.items;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.Resources;
 
 import java.util.HashMap;
 
@@ -14,8 +15,8 @@ public class SeedList
 
     public SeedList(Arborium game)
     {
-        Texture appleSeedTexture = game.resources.getTexture("seed2.png");
-        Texture orangeSeedTexture = game.resources.getTexture("seed3.png");
+        Texture appleSeedTexture = game.resources.getTexture(Resources.APPLE_SEED);
+        Texture orangeSeedTexture = game.resources.getTexture(Resources.ORANGE_SEED);
 
         apple = new Seed(128, "Apple Seed", appleSeedTexture, 100, 100 * 3/4, false, game.treeList.appleTree);
         orange = new Seed(129, "Orange Seed", orangeSeedTexture, 250, 250 * 3/4, false, game.treeList.orangeTree);

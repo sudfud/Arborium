@@ -2,6 +2,15 @@ package com.mygdx.arborium.items;
 
 import com.badlogic.gdx.graphics.Texture;
 
+/*
+ * An Item that can be bought and/or sold in the game's shop. Has a buy and sell value, and can be
+ * either be locked or unlocked. If an Item can only be bought, the sell value should be -1, and
+ * vice versa.
+ *
+ * Subclasses: Fruit, Seed
+ *
+ */
+
 public abstract class ShopItem extends SpriteItem
 {
     public final int buyValue;

@@ -3,6 +3,14 @@ package com.mygdx.arborium.items;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/*
+ * This base class represents all items used in the game. An "Item" can be considered as anything
+ * that holds some form of data to be utilized by the user.
+ *
+ * Subclasses: SpriteItem, Tree
+ *
+ */
+
 public abstract class Item
 {
     public final int id;
@@ -43,6 +51,7 @@ public abstract class Item
         return itemLookup.get(name);
     }
 
+    // Returns the list of names of *all* items matching the given type.
     public static String[] getItemsOfType(Class<?> type)
     {
         String[] allItems = itemLookup.keySet().toArray(new String[itemLookup.size()]);

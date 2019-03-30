@@ -12,6 +12,20 @@ import com.mygdx.arborium.Arborium;
 import java.util.HashMap;
 import java.util.Set;
 
+/*
+ * The game's inventory is managed by a hashmap with String keys and Integer values.
+ *
+ * The keys in this case are the item names, and the values are the amounts of these Items
+ * the user currently has.
+ *
+ * Items are 'added' to and 'removed' from the inventory by incrementing or decrementing the Item's
+ * count respectively. If the 'last' of an Item is taken, the Item's key is removed from the hashmap.
+ *
+ * Whenever the inventory is changed in any way, it should be serialized and updated in the game's
+ * preferences.
+ *
+ */
+
 public class Inventory
 {
     private static Arborium game;
@@ -93,6 +107,7 @@ public class Inventory
         return inventory.keySet().toArray(new String[inventory.size()]);
     }
 
+    // Returns a list of names of all items *currently in inventory* that matches the given type
     public static String[] getItemsOfType(Class<?> type)
     {
         String[] keys = inventory.keySet().toArray(new String[inventory.size()]);
@@ -105,24 +120,6 @@ public class Inventory
             }
         }
         return matchingKeys.toArray(new String[matchingKeys.size()]);
-    }
-
-    public static String[] getItems(InventoryCategory cat)
-    {
-        ArrayList<String> records = new ArrayList<String>();
-        Gdx.app.log("Inventory", inventory.keySet().toString());
-        switch(cat)
-        {
-            case SEED:
-                for (String seed : game.seedList.getSeedNames())
-                {
-                    if (inventory.containsKey(seed))
-                        records.add(seed);
-                }
-                break;
-        }
-
-        return records.toArray(new String[records.size()]);
     }
 
     public static boolean isEmpty()

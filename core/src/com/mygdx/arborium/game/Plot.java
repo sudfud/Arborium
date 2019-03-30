@@ -6,6 +6,16 @@ import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.items.Tree;
 import com.mygdx.arborium.items.TreeList;
 
+/*
+ * The Plot class handles Tree growth, maturity, and production. Plots can be empty, or they can
+ * contain a single planted Tree.
+ *
+ * If a Tree is planted, it is this class' job to keep track of the tree's state as well as the time
+ * relative to when the Tree was planted, when it will mature, and subsequently when it will be
+ * ready to be harvested.
+ *
+ */
+
 public class Plot
 {
     private Arborium game;
@@ -36,18 +46,23 @@ public class Plot
     boolean readyToHarvest;
 
     Tree plantedTree;
+    Farm farm;
 
-    public Plot(int num, Arborium game)
+    public Plot(Arborium game, int num, Farm farm)
     {
         plotNumber = num;
         this.game = game;
+        this.farm = farm;
 
-        plantTimeKey = "Plot" + num + "PlantTime";
-        harvestKey = "Plot" + num + "LastHarvest";
-        emptyKey = "Plot" + num + "Empty";
-        matureKey = "Plot" + num + "Mature";
-        treeKey = "Plot" + num + "TreeType";
+        String farmTag = farm.name;
 
+        plantTimeKey = farmTag + "Plot" + num + "PlantTime";
+        harvestKey = farmTag + "Plot" + num + "LastHarvest";
+        emptyKey = farmTag + "Plot" + num + "Empty";
+        matureKey = farmTag + "Plot" + num + "Mature";
+        treeKey = farmTag + "Plot" + num + "TreeType";
+
+        // Check to see if this plot was already occupied in a previous run.
         empty = (!pref.contains(emptyKey)) || pref.getBoolean(emptyKey);
 
         if (empty)
@@ -56,6 +71,8 @@ public class Plot
             mature = false;
             readyToHarvest = false;
         }
+
+        // If it was, retrieve the plot's state information from the game's preferences.
         else
         {
             String treeType = pref.getString(treeKey);
@@ -77,6 +94,7 @@ public class Plot
         }
     }
 
+    //
     public void plantSeed(Tree tree)
     {
         plantedTree = tree;
@@ -128,8 +146,7 @@ public class Plot
             lastHarvestTime = TimeUtils.millis();
             readyToHarvest = false;
 
-            String key = "Plot" + plotNumber + "LastHarvest";
-            pref.putLong(key, lastHarvestTime);
+            pref.putLong(harvestKey, lastHarvestTime);
             pref.flush();
         }
     }
@@ -159,8 +176,23 @@ public class Plot
         return timeSinceLastHarvest;
     }
 
+    public long getLastHarvestTime()
+    {
+        return lastHarvestTime;
+    }
+
     public long getTimeSincePlanted()
     {
         return timeSincePlanted;
+    }
+
+    public long getProduceRate()
+    {
+        return produceRate;
+    }
+
+    public Farm getFarm()
+    {
+        return farm;
     }
 }

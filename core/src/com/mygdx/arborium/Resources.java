@@ -1,10 +1,19 @@
 package com.mygdx.arborium;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+
+/*
+ * All of the game's resources should be stored here. Resources in this case include Textures,
+ * Skins, Sounds, Music, Fonts, etc. Resources are managed by the AssetManager instance.
+ *
+ * Ensure that resources are NOT declared static (my bad), but instead loaded into the AssetManager,
+ * and then later retrieved from it using either the AM get() method or the class-specific get
+ * methods below. To make this easier, a list of static String constants are provided to hold
+ * resource file names and directories.
+ *
+ */
 
 public class Resources
 {
@@ -16,6 +25,8 @@ public class Resources
     public static final String GRASS = "grass.png";
     public static final String DIRT_PATCH = "dirtpatch.png";
     public static final String DIRT_PLOT = "dirtplot.png";
+
+    public static final String TREE_OVERWORLD = "tree-overworld.png";
 
     public static final String TREE_1_ADULT = "tree1_adult.png";
     public static final String TREE_1_YOUNG_ADULT = "tree1_youngadult.png";
@@ -39,6 +50,8 @@ public class Resources
         assetManager.load(GRASS, Texture.class);
         assetManager.load(DIRT_PATCH, Texture.class);
         assetManager.load(DIRT_PLOT, Texture.class);
+
+        assetManager.load(TREE_OVERWORLD, Texture.class);
 
         assetManager.load(TREE_1_ADULT, Texture.class);
         assetManager.load(TREE_1_YOUNG_ADULT, Texture.class);

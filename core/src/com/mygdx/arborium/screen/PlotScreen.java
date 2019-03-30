@@ -3,9 +3,12 @@ package com.mygdx.arborium.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -21,7 +24,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import com.badlogic.gdx.physics.box2d.Box2D;
+
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.GameUtils;
 import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.game.Plot;
@@ -33,9 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 public class PlotScreen implements Screen
 {
-    public static final int GDX_WIDTH = Gdx.graphics.getWidth();
-    public static final int GDX_HEIGHT = Gdx.graphics.getHeight();
-
     Arborium game;
 
     private Plot plot;
@@ -50,7 +53,6 @@ public class PlotScreen implements Screen
     Skin skin;
     TextButton backButton;
     TextButton plantButton;
-    TextButton harvestButton;
 
     Table seedSelectTable;
     ScrollPane seedSelectScrollPane;
@@ -64,13 +66,16 @@ public class PlotScreen implements Screen
     private Texture sky, dirtplot, dirtpatch, adult_tree,
     youngAdult_tree, teenager_tree, child_tree, baby_tree;
 
-    Texture background;
     Texture grass;
-    Texture dirt;
 
     Random random;
     private boolean fruitDrawn = false;
     private Vector2[] fruitPositions;
+
+    private OrthographicCamera camera;
+
+    // Used for physics, i.e. falling fruits
+    World physWorld;
 
     public PlotScreen(final Arborium game, Plot plot)
     {
@@ -131,7 +136,7 @@ public class PlotScreen implements Screen
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
                 seedTouched = false;
-                seedImage.setY(GDX_HEIGHT * 3/4);
+                seedImage.setY(game.GDX_HEIGHT * 3/4);
             }
         });
         seedImage.setVisible(false);
@@ -141,6 +146,13 @@ public class PlotScreen implements Screen
 
         initializeButtons();
         addButtonListeners();
+
+        physWorld = new World(new Vector2(0, -9.81f), true);
+        Box2DDebugRenderer physDebug = new Box2DDebugRenderer();
+
+        camera = new OrthographicCamera(game.GDX_WIDTH, game.GDX_HEIGHT);
+        camera.position.set(game.GDX_WIDTH/2, game.GDX_HEIGHT/2, 0);
+        camera.update();
     }
 
     @Override
@@ -182,8 +194,6 @@ public class PlotScreen implements Screen
         {
             plot.update();
 
-            if (!plot.isEmpty() && plot.isReadyToHarvest())
-                harvestButton.setVisible(true);
             batch.begin();
             //batch.draw(adult_tree, -240, 265);
             batch.end();
@@ -198,7 +208,7 @@ public class PlotScreen implements Screen
         // This should only be true if there's currently a seed selected to plant
         if (seedTouched)
         {
-            int y = GDX_HEIGHT - Gdx.input.getY();
+            int y = game.GDX_HEIGHT - Gdx.input.getY();
 
             // If the seed is currently on or under the bottom quarter of
             // the screen, plant the seed and bring back the main table
@@ -228,8 +238,8 @@ public class PlotScreen implements Screen
                 fruitPositions = new Vector2[plot.getPlantedTree().getProduceAmount()];
                 for (int i = 0; i < fruitPositions.length; i++)
                 {
-                    int x = random.nextInt(GDX_WIDTH) - 100;
-                    int y = random.nextInt(GDX_HEIGHT/2) + GDX_HEIGHT/2 - 100;
+                    int x = random.nextInt(game.GDX_WIDTH) - 100;
+                    int y = random.nextInt(game.GDX_HEIGHT/2) + game.GDX_HEIGHT * 3/4 - 100;
 
                     fruitPositions[i] = new Vector2(x, y);
                 }
@@ -246,34 +256,41 @@ public class PlotScreen implements Screen
             }
         }
 
+        batch.setProjectionMatrix(camera.combined);
+
         batch.begin();
 
         // Draw the static (unchanging) textures
         batch.draw(sky, 0, 0, 0, 0, (int) stage.getWidth(), (int) stage.getHeight());
         batch.draw(grass, 0, 0);
 
-        int centerX = GDX_WIDTH/2;
-        batch.draw(dirtplot, centerX - dirtplot.getWidth()/2, 200);
-        batch.draw(dirtpatch, centerX - dirtpatch.getWidth()/2, 165);
+        int centerX = game.GDX_WIDTH/2;
+        int dirtPatchCenter = dirtpatch.getWidth()/2;
+        int dirtPlotCenter = dirtplot.getWidth()/2;
+        batch.draw(dirtplot, centerX - dirtPlotCenter, 200);
+        batch.draw(dirtpatch, centerX - dirtPatchCenter, 165);
 
         // If the plot has a tree, draw it based on how long the tree has
         // to wait to mature.
         if (!plot.isEmpty())
         {
+            long timeSincePlanted = plot.getTimeSincePlanted();
+            long matureTime = plot.getPlantedTree().getMatureTime();
+
             if (plot.isReadyToHarvest() || plot.isMature())
-            batch.draw(adult_tree, centerX - dirtpatch.getWidth()/2, 165);
+            batch.draw(adult_tree, centerX - dirtPatchCenter, 165);
 
-            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 4 / 5)))
-                batch.draw(youngAdult_tree, centerX - dirtpatch.getWidth()/2, 165);
+            else if (timeSincePlanted > matureTime * 4 / 5)
+                batch.draw(youngAdult_tree, centerX - dirtPatchCenter, 165);
 
-            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 3 / 5)))
-                batch.draw(teenager_tree, centerX - dirtpatch.getWidth()/2, 165);
+            else if (timeSincePlanted > matureTime * 3 / 5)
+                batch.draw(teenager_tree, centerX - dirtPatchCenter, 165);
 
-            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() * 2 / 5)))
-                batch.draw(child_tree, centerX - dirtpatch.getWidth()/2, 165);
+            else if (timeSincePlanted > matureTime * 2 / 5)
+                batch.draw(child_tree, centerX - dirtPatchCenter, 165);
 
-            else if ((plot.getTimeSincePlanted() > (plot.getPlantedTree().getMatureTime() / 5)))
-                batch.draw(baby_tree, centerX - dirtpatch.getWidth()/2, 165);
+            else if (timeSincePlanted > matureTime / 5)
+                batch.draw(baby_tree, centerX - dirtPatchCenter, 165);
         }
 
         // Draw the fruits
@@ -293,6 +310,8 @@ public class PlotScreen implements Screen
         // Update and draw stage
         stage.act();
         stage.draw();
+
+        physWorld.step(1 / 60f, 6, 2);
     }
 
     @Override
@@ -311,9 +330,6 @@ public class PlotScreen implements Screen
         if (!plot.isEmpty())
         {
             plot.update();
-
-            if (!plot.isEmpty() && plot.isReadyToHarvest())
-                harvestButton.setVisible(true);
         }
         else
             plantButton.setVisible(true);
@@ -336,6 +352,7 @@ public class PlotScreen implements Screen
     public void setPlot(Plot p)
     {
         plot = p;
+        fruitDrawn = false;
     }
 
 
@@ -346,11 +363,6 @@ public class PlotScreen implements Screen
         plantButton = new TextButton("Plant", skin);
         table.row();
         table.add(plantButton).width(150).height(100).expandX().space(25);
-
-        harvestButton = new TextButton("Harvest", skin);
-        harvestButton.setVisible(false);
-        table.row();
-        table.add(harvestButton).width(150).height(100).space(25);
 
         backButton = new TextButton("Back", skin);
         table.row();
@@ -373,7 +385,7 @@ public class PlotScreen implements Screen
             public void touchUp(InputEvent event, float x, float y, int pointer, int button)
             {
                 Gdx.app.log("PlotScreen", "Back");
-                game.setScreen(game.farmScreen);
+                GameUtils.delaySetScreen(game, 0.15f, game.farmScreen);
             }
         });
 
@@ -391,18 +403,6 @@ public class PlotScreen implements Screen
             }
         });
 
-        harvestButton.addListener(new ClickListener()
-        {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
-            {
-                if (!plot.isEmpty() && plot.isReadyToHarvest())
-                    plot.harvest();
-                harvestButton.setVisible(false);
-                return true;
-            }
-        });
-
         seedSelectButton.addListener(new ClickListener()
         {
             @Override
@@ -417,7 +417,7 @@ public class PlotScreen implements Screen
                     Seed seed = game.seedList.get(seedName);
                     seedImage.setDrawable(new TextureRegionDrawable(seed.itemImage));
                     seedImage.setSize(100, 100);
-                    seedImage.setPosition(GDX_WIDTH / 2 - seedImage.getWidth() / 4, GDX_HEIGHT * 3 / 4);
+                    seedImage.setPosition(game.GDX_WIDTH / 2 - seedImage.getWidth() / 4, game.GDX_HEIGHT * 3 / 4);
                     seedImage.setVisible(true);
                     stage.addActor(seedImage);
                 }

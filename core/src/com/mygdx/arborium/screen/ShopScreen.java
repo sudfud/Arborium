@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.GameUtils;
 import com.mygdx.arborium.Resources;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Inventory;
@@ -155,6 +156,7 @@ public class ShopScreen implements Screen
     public void show()
     {
         Gdx.input.setInputProcessor(stage);
+        updateLabels();
     }
 
     @Override
@@ -185,8 +187,9 @@ public class ShopScreen implements Screen
     }
 
     @Override
-    public void resume() {
-
+    public void resume()
+    {
+        updateLabels();
     }
 
     @Override
@@ -239,7 +242,10 @@ public class ShopScreen implements Screen
 
     private void setBuyItems()
     {
-        itemList.setItems(game.seedList.getSeedNames());
+        String[] shopItems = Item.getItemsOfType(Seed.class);
+        ArrayList<String> buyableItems = new ArrayList<String>();
+
+        itemList.setItems(shopItems);
     }
 
     private void setSellItems()
@@ -249,6 +255,6 @@ public class ShopScreen implements Screen
 
     private void back()
     {
-        game.setScreen(game.farmScreen);
+        GameUtils.delaySetScreen(game, 0.15f, game.farmScreen);
     }
 }

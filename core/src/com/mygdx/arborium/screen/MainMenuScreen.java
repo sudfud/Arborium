@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.GameUtils;
 import com.mygdx.arborium.Resources;
 
 public class MainMenuScreen implements Screen
@@ -127,6 +128,6 @@ public class MainMenuScreen implements Screen
 
     private void toFarmScreen()
     {
-        game.setScreen(game.farmScreen);
+        GameUtils.delaySetScreen(game, 0.15f, game.farmScreen);
     }
 }
