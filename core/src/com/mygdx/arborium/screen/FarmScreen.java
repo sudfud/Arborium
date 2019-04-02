@@ -44,6 +44,8 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
 {
     private float currentZoom;
 
+    private float cameraX, cameraY;
+
     private Arborium game;
 
     private OrthographicCamera camera;
@@ -98,8 +100,11 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         plotRects = new ArrayList<Rectangle>();
         plotMap = new HashMap<Rectangle, Plot>();
         MapLayers medFarmLayers = farmMap.getLayers();
-        MapObjects[] medFarmObjects = new MapObjects[] { medFarmLayers.get("Med Farm 1").getObjects(),
-                                                         medFarmLayers.get("Med Farm 2").getObjects()};
+        MapObjects[] medFarmObjects = new MapObjects[] 
+        { 
+            medFarmLayers.get("Med Farm 1").getObjects(),
+            medFarmLayers.get("Med Farm 2").getObjects()
+        };
 
         for (int i = 0; i < game.mediumFarms.length; i++)
         {
@@ -113,6 +118,8 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
                 plotMap.put(scaledRect, game.mediumFarms[i].getPlot(j));
             }
         }
+
+        centerCamera();
     }
 
     @Override
@@ -130,7 +137,7 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         dirtplot = game.resources.getTexture(Resources.DIRT_PLOT);
         tree = game.resources.getTexture(Resources.TREE_OVERWORLD);
 
-        centerCamera();
+        //centerCamera();
     }
 
     @Override
@@ -172,7 +179,7 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
     @Override
     public void pause()
     {
-        centerCamera();
+        //centerCamera();
     }
 
     @Override
@@ -184,7 +191,7 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
     @Override
     public void hide()
     {
-        centerCamera();
+        //centerCamera();
     }
 
     @Override
@@ -279,6 +286,16 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         float scaledDeltaX = deltaX * (camera.viewportWidth / game.GDX_WIDTH);
         float scaledDeltaY = deltaY * (camera.viewportHeight / game.GDX_WIDTH);
         camera.translate(-scaledDeltaX * currentZoom, scaledDeltaY * currentZoom);
+
+        float viewportXHalf = camera.viewportWidth/2;
+        float viewportYHalf = camera.viewportHeight/2;
+
+        float mapWidth = farmMap.getProperties().get("width", Integer.class);
+        float mapHeight = farmMap.getProperties().get("height", Integer.class);
+
+        camera.position.x = MathUtils.clamp(camera.position.x, viewportXHalf, mapWidth - viewportXHalf);
+        camera.position.y = MathUtils.clamp(camera.position.y, viewportYHalf, mapHeight - viewportYHalf);
+        
         return true;
     }
 
