@@ -13,8 +13,8 @@ public class TreeList
 
     public TreeList(Arborium game)
     {
-        appleTree = new Tree(1, "Apple Tree", 5, 20, 90, game.fruitList.apple);
-        orangeTree = new Tree(2, "Orange Tree", 7, 45, 75, game.fruitList.orange);
+        appleTree = new Tree(1, "Apple Tree", 5, 1, 1, game.fruitList.apple);
+        orangeTree = new Tree(2, "Orange Tree", 7, 1, 1, game.fruitList.orange);
 
         treeMap.put(appleTree.itemName, appleTree);
         treeMap.put(orangeTree.itemName, orangeTree);

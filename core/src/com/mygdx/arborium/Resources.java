@@ -40,6 +40,8 @@ public class Resources
     public static final String APPLE_FRUIT = "fruits/red-apple.png";
     public static final String ORANGE_FRUIT = "fruits/orange.png";
 
+    public static final String TREE_ANIM = "Tree2/sprite_tree_2";
+
     public Resources()
     {
         assetManager = new AssetManager();
@@ -65,6 +67,12 @@ public class Resources
 
         assetManager.load(APPLE_FRUIT, Texture.class);
         assetManager.load(ORANGE_FRUIT, Texture.class);
+
+        for (int i = 0; i <= 123; i++)
+        {
+            String formatInt = String.format("%03d", i);
+            assetManager.load(TREE_ANIM + formatInt + ".png", Texture.class);
+        }
 
         assetManager.finishLoading();
     }
