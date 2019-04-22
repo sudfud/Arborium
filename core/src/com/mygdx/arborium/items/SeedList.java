@@ -15,8 +15,8 @@ public class SeedList
 
     public SeedList(Arborium game)
     {
-        Texture appleSeedTexture = game.resources.getTexture(Resources.APPLE_SEED);
-        Texture orangeSeedTexture = game.resources.getTexture(Resources.ORANGE_SEED);
+        Texture appleSeedTexture = game.getTexture(Arborium.APPLE_SEED);
+        Texture orangeSeedTexture = game.getTexture(Arborium.ORANGE_SEED);
 
         apple = new Seed(128, "Apple Seed", appleSeedTexture, 100, 100 * 3/4, false, game.treeList.appleTree);
         orange = new Seed(129, "Orange Seed", orangeSeedTexture, 250, 250 * 3/4, false, game.treeList.orangeTree);

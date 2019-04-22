@@ -37,7 +37,7 @@ public class MainMenuScreen implements Screen
     {
         this.game = game;
 
-        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
+        skin = game.getSkin(Arborium.GLASSY_SKIN);
         skin.getFont("font-big").getData().setScale(0.75f);
 
         // Setup stage and table
@@ -75,7 +75,7 @@ public class MainMenuScreen implements Screen
         table.row();
         table.add(quitButton).width(200).height(100);
 
-        background = game.resources.getTexture(Resources.BG_SKY);
+        background = game.getTexture(Arborium.BG_SKY);
     }
 
     @Override

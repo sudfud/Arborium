@@ -92,7 +92,7 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         table.setFillParent(true);
         stage.addActor(table);
 
-        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
+        skin = game.getSkin(Arborium.GLASSY_SKIN);
 
         testHarvestButtons = new TextButton[9];
         initializeButtons();
@@ -132,10 +132,10 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         Gdx.input.setInputProcessor(im);
 
         // Grab needed textures from the game's resource manager.
-        sky = game.resources.getTexture(Resources.BG_SKY);
-        grass = game.resources.getTexture(Resources.GRASS);
-        dirtplot = game.resources.getTexture(Resources.DIRT_PLOT);
-        tree = game.resources.getTexture(Resources.TREE_OVERWORLD);
+        sky = game.getTexture(Arborium.BG_SKY);
+        grass = game.getTexture(Arborium.GRASS);
+        dirtplot = game.getTexture(Arborium.DIRT_PLOT);
+        tree = game.getTexture(Arborium.TREE_OVERWORLD);
 
         //centerCamera();
     }

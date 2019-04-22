@@ -141,7 +141,6 @@ public class Plot
     {
         if (readyToHarvest)
         {
-            Inventory.addItem(plantedTree.getFruit().itemName, produceAmount);
             timeSinceLastHarvest = 0;
             lastHarvestTime = TimeUtils.millis();
             readyToHarvest = false;

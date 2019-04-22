@@ -62,7 +62,7 @@ public class ShopScreen implements Screen
         // table.setDebug(true);
         stage.addActor(table);
 
-        skin = game.resources.getSkin(Resources.GLASSY_SKIN);
+        skin = game.getSkin(Arborium.GLASSY_SKIN);
 
         // Set up selection box for buying and selling items (maybe easier to split the two?)
         shopSelectBox = new SelectBox(skin);
@@ -149,7 +149,7 @@ public class ShopScreen implements Screen
         table.row();
         table.add(backButton);
 
-        background = game.resources.getTexture(Resources.BG_SKY);
+        background = game.getTexture(Arborium.BG_SKY);
     }
 
     @Override

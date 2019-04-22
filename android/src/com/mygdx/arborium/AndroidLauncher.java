@@ -32,31 +32,31 @@ public class AndroidLauncher extends AndroidApplication
 		{
 			Intent intent = new Intent(this, TimerService.class);
 
-			for (int i = 0; i < game.mediumFarms.length; i++)
+			if (game.mediumFarms != null)
 			{
-				Farm farm = game.mediumFarms[i];
-				if (!farm.isLocked())
-				{
-					String farmTag = farm.name;
+				for (int i = 0; i < game.mediumFarms.length; i++) {
+					Farm farm = game.mediumFarms[i];
+					if (!farm.isLocked()) {
+						String farmTag = farm.name;
 
-					for (int j = 0; j < game.mediumFarms[i].getPlotSize(); j++)
-					{
-						Plot plot = farm.getPlot(j);
+						for (int j = 0; j < game.mediumFarms[i].getPlotSize(); j++) {
+							Plot plot = farm.getPlot(j);
 
-						String plotTag = "Plot" + j;
+							String plotTag = "Plot" + j;
 
-						String matureTag = farmTag + plotTag + "Mature";
-						String lastHarvestTag = farmTag + plotTag + "LastHarvest";
-						String produceRateTag = farmTag + plotTag + "ProduceRate";
+							String matureTag = farmTag + plotTag + "Mature";
+							String lastHarvestTag = farmTag + plotTag + "LastHarvest";
+							String produceRateTag = farmTag + plotTag + "ProduceRate";
 
-						boolean mature = plot.isMature();
-						intent.putExtra(matureTag, mature);
+							boolean mature = plot.isMature();
+							intent.putExtra(matureTag, mature);
 
-						if (mature) {
-							long lastHarvest = plot.getLastHarvestTime();
-							long produceRate = plot.getProduceRate();
-							intent.putExtra(lastHarvestTag, lastHarvest);
-							intent.putExtra(produceRateTag, produceRate);
+							if (mature) {
+								long lastHarvest = plot.getLastHarvestTime();
+								long produceRate = plot.getProduceRate();
+								intent.putExtra(lastHarvestTag, lastHarvest);
+								intent.putExtra(produceRateTag, produceRate);
+							}
 						}
 					}
 				}

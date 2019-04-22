@@ -53,7 +53,7 @@ public class TimerService extends Service
             {
                 checkHarvest(finalIntent);
             }
-        }, 1000 * 60 * 5, 1000 * 60 * 5);
+        }, 1000 * 5, 1000 * 5);
 
         return Service.START_NOT_STICKY;
     }
@@ -74,7 +74,7 @@ public class TimerService extends Service
             if (!farm.isLocked())
             {
                 String farmTag = farm.name;
-                for (int j = 0; j < farm.getPlotSize(); i++)
+                for (int j = 0; j < farm.getPlotSize(); j++)
                 {
                     Plot plot = farm.getPlot(j);
 

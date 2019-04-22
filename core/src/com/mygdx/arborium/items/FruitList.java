@@ -15,8 +15,8 @@ public class FruitList
 
     public FruitList(Arborium game)
     {
-        Texture appleTexture = game.resources.getTexture(Resources.APPLE_FRUIT);
-        Texture orangeTexture = game.resources.getTexture(Resources.ORANGE_FRUIT);
+        Texture appleTexture = game.getTexture(Arborium.APPLE_FRUIT);
+        Texture orangeTexture = game.getTexture(Arborium.ORANGE_FRUIT);
 
         apple = new Fruit(64, "Apple Fruit", appleTexture, -1, 10);
         orange = new Fruit(65, "Orange Fruit", orangeTexture, -1, 25);
