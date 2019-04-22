@@ -484,7 +484,7 @@ public class PlotScreen implements Screen, GestureListener {
         stage.act();
         stage.draw();
 
-        physDebug.render(physWorld, camera.combined);
+        // physDebug.render(physWorld, camera.combined);
     }
 
     @Override
