@@ -83,9 +83,8 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         stage = new Stage(new ScreenViewport());
 
         farmMap = new TmxMapLoader().load("farm1.tmx");
-        mapRenderer = new OrthoCachedTiledMapRenderer(farmMap, 1 / 32f);
-
-        shapeRenderer = new ShapeRenderer();
+        mapRenderer = new OrthoCachedTiledMapRenderer(farmMap, 1 / 64f);
+        mapRenderer.setView(camera);
 
         // Setup table
         table = new Table();
@@ -150,22 +149,22 @@ public class FarmScreen implements Screen, GestureDetector.GestureListener
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        camera.update();
+        //camera.update();
 
-        mapRenderer.setView(camera);
+        //mapRenderer.setView(camera);
         mapRenderer.render();
 
-        game.spriteBatch.setProjectionMatrix(camera.combined);
-        game.spriteBatch.begin();
+        //game.spriteBatch.setProjectionMatrix(camera.combined);
+        //game.spriteBatch.begin();
         for (Rectangle rect : plotRects)
         {
             Plot plot = plotMap.get(rect);
             if (!plot.isEmpty())
             {
-                game.spriteBatch.draw(tree, rect.x, rect.y, rect.width, rect.height);
+          //      game.spriteBatch.draw(tree, rect.x, rect.y, rect.width, rect.height);
             }
         }
-        game.spriteBatch.end();
+        //game.spriteBatch.end();
 
         stage.act();
         stage.draw();

@@ -6,8 +6,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -58,6 +61,13 @@ public class MainMenuScreen implements Screen
                 return true;
             }
         });
+        startButton.setSize(200, 100);
+        startButton.setPosition(game.GDX_WIDTH/2, -200);
+        MoveToAction moveAction = Actions.action(MoveToAction.class);
+        moveAction.setPosition(game.GDX_WIDTH/2 - 100, game.GDX_HEIGHT/2 - 50);
+        moveAction.setDuration(2);
+        moveAction.setInterpolation(Interpolation.sine);
+       // startButton.addAction(moveAction);
         table.add(startButton).width(200).height(100).space(50);
 
 

@@ -64,7 +64,7 @@ public class PlotScreen implements Screen, GestureListener {
     final int FRUIT_INDEX = -1;
     final int BASKET_INDEX = -2;
 
-    final float SCALE = 25.0f;
+    final float SCALE = 50.0f;
 
     final float BASKET_WIDTH;
     final float BASKET_HEIGHT;
@@ -120,14 +120,15 @@ public class PlotScreen implements Screen, GestureListener {
     // Used for physics, i.e. falling fruits
     World physWorld;
     Box2DDebugRenderer physDebug;
-    Array<Body> fruitBodies;
+    ArrayList<Body> fruitBodies;
     Array<Body> fruitDeleteList;
 
     private Timer fruitDropTimer;
 
     private HashMap<Plot, Vector2[]> fruitPositionMap;
 
-    public PlotScreen(final Arborium game, Plot plot) {
+    public PlotScreen(final Arborium game, Plot plot)
+    {
         this.game = game;
         stage = new Stage(new ScreenViewport());
         this.plot = plot;
@@ -138,64 +139,7 @@ public class PlotScreen implements Screen, GestureListener {
         basketX = game.GDX_WIDTH / 2 / SCALE - BASKET_WIDTH / 2;
         Gdx.app.log("PlotScreen", "" + basketX);
 
-        basketTexture = game.getTexture(Arborium.BASKET);
-        basketImage = new Image(basketTexture);
-        basketImage.setSize(BASKET_WIDTH * SCALE, BASKET_HEIGHT * SCALE);
-        basketImage.setPosition(basketX * SCALE, basketY * SCALE);
-        basketImage.setVisible(false);
-        basketImage.addListener(new ClickListener()
-        {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                basketTouched = true;
-                return true;
-            }
-
-            // Send the seed image to its original position
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                basketTouched = false;
-            }
-        });
-        stage.addActor(basketImage);
-
-        // Setup Stack and add to stage
-        stack = new Stack();
-        stack.setFillParent(true);
-        stage.addActor(stack);
-
-        // Setup main table and add to stack
-        table = new Table();
-        table.setFillParent(true);
-        stack.add(table);
-        stack.setDebug(true);
-
-        skin = game.getSkin(Arborium.GLASSY_SKIN);
-
-        // Setup tree label, add to table
-        plantedTreeLabel = new Label("", skin);
-        plantedTreeLabel.setAlignment(Align.center);
-        plantedTreeLabel.setFontScale(2);
-        table.add(plantedTreeLabel).width(500);
-        table.row();
-
-        // Setup mature/harvest timer, add to main table.
-        harvestTimer = new Label("", skin);
-        harvestTimer.setAlignment(Align.center);
-        harvestTimer.setFontScale(2);
-        table.add(harvestTimer).width(500).expandX().center().space(25);
-
-        // Setup seed selection table, added to stack later
-        seedSelectTable = new Table();
-        seedSelectTable.setFillParent(true);
-
-        seedSelectList = new List<String>(skin);
-
-        seedSelectScrollPane = new ScrollPane(seedSelectList, skin);
-        seedSelectTable.add(seedSelectScrollPane).size(250, 500);
-
-        // Setup a dummy seed image, to be modified later when the user selects a
-        // seed to plant
+        initUI();
 
         random = new Random();
 
@@ -205,7 +149,7 @@ public class PlotScreen implements Screen, GestureListener {
         physWorld = new World(new Vector2(0, -9.81f), true);
         
         physDebug = new Box2DDebugRenderer();
-        fruitBodies = new Array<Body>();
+        fruitBodies = new ArrayList<Body>();
         fruitDeleteList = new Array<Body>();
 
         fruitDropTimer = new Timer();
@@ -252,7 +196,7 @@ public class PlotScreen implements Screen, GestureListener {
                     contact.getFixtureB();
 
                 Body fruitBody = fruit.getBody();
-                fruitDeleteList.add(fruitBody);
+                fruitBody.setActive(false);
                 Inventory.addItem(plot.getPlantedTree().getFruit().itemName, 1);
             }
 
@@ -337,90 +281,20 @@ public class PlotScreen implements Screen, GestureListener {
         // This should only be true if there's currently a seed selected to plant
         if (seedTouched)
         {
-            int y = game.GDX_HEIGHT - Gdx.input.getY();
-
-            // If the seed is currently on or under the bottom quarter of
-            // the screen, plant the seed and bring back the main table
-            if (y <= 200)
-            {
-                seedImage.setVisible(false);
-                String seedName = seedSelectList.getSelected();
-                Seed seed = game.seedList.get(seedName);
-                plot.plantSeed(seed.treeType);
-                Inventory.takeItem(seedName);
-                stack.add(table);
-                plantButton.setVisible(false);
-                backButton.setVisible(true);
-                seedTouched = false;
-            }
-
-            // Set the seed's y position to where the screen was touched
-            seedImage.setY(y);
+            seedUpdate();
         }
 
         physWorld.step(1 / 60f, 6, 2);
 
         if (harvesting)
          {
-            // Harvest the tree and stop drawing the fruit when the phone
-            // is shaken.
-            float shakeAmt = Math.abs(Gdx.input.getAccelerometerX());
-            if (shakeAmt >= 25) 
-            {
-                plot.harvest();
-                physWorld.getBodies(fruitBodies);
-                for (int i = 0; i < fruitBodies.size; i++) 
-                {
-                    Fixture bodyFixture = fruitBodies.get(i).getFixtureList().get(0);
-                    if (bodyFixture.getFilterData().groupIndex == FRUIT_INDEX)
-                    {
-                        final int seconds = i;
-                        fruitDropTimer.scheduleTask(new Task()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                fruitBodies.get(seconds).setAwake(true);
-                            }
-                        }, seconds);
-                    }
-                }
-            }
+            checkForShake();
 
-            int fruitOffScreenCount = 0;
-
-            if (fruitDeleteList.size > 0)
-            {
-                for (Body body : fruitDeleteList)
-                {
-                    physWorld.destroyBody(body);
-                }
-                fruitDeleteList.clear();
-            }
-
-            physWorld.getBodies(fruitBodies);
-            for (Body b : fruitBodies)
-            {
-                Fixture bodyFixture = b.getFixtureList().first();
-                if (bodyFixture.getFilterData().groupIndex == FRUIT_INDEX && b.getPosition().y < -50/SCALE)
-                {
-                    //fruitOffScreenCount++;
-                    fruitDeleteList.add(b);
-                }
-
-                else if (bodyFixture.getFilterData().groupIndex == BASKET_INDEX)
-                {
-                    b.getPosition().set(basketX + BASKET_WIDTH/2, basketY);
-                }
-            }
+            updateFruitBodies();
 
             if(physWorld.getBodyCount() <= 1)
             {
-                harvesting = false;
-                initializeBodies();
-
-                // For some reason the harvest button won't work when the screen's unchanged unless the listener is re-added
-                addButtonListeners();
+                
             }
         }
 
@@ -433,58 +307,39 @@ public class PlotScreen implements Screen, GestureListener {
         batch.draw(grass, 0, 0, grass.getWidth()/SCALE, grass.getHeight()/SCALE);
 
         float centerX = game.GDX_WIDTH/2/SCALE;
-        float dirtPatchCenterX = dirtpatch.getWidth()/2/SCALE;
-        float dirtPatchCenterY = dirtpatch.getHeight()/2/SCALE;
-        batch.draw(dirtplot, centerX - dirtplot.getWidth()/2/SCALE, game.GDX_WIDTH/4/SCALE, dirtplot.getWidth()/SCALE, dirtplot.getHeight()/SCALE);
+        batch.draw(
+                dirtplot,
+                centerX - dirtplot.getWidth()/2/SCALE,
+                game.GDX_WIDTH/4/SCALE,
+                dirtplot.getWidth()/SCALE,
+                dirtplot.getHeight()/SCALE);
 
         // If the plot has a tree, draw it based on how long the tree has
         // to wait to mature.
         if (!plot.isEmpty())
         {
-            float timeSincePlanted = plot.getTimeSincePlanted();
-            float matureTime = plot.getPlantedTree().getMatureTime();
-            int treeFrameIndex = MathUtils.clamp((int)(timeSincePlanted / matureTime * 123), 0, 123);
-
-            String formatIndex = String.format("%03d", treeFrameIndex);
-            Texture treeFrame = game.getTexture(Arborium.TREE_ANIM + formatIndex + ".png");
-
-            float treeCenterX = treeFrame.getWidth()/2/SCALE;
-
-            batch.draw(treeFrame, (float)game.GDX_WIDTH/8/SCALE, (float)game.GDX_HEIGHT/4/SCALE, (float)game.GDX_WIDTH*3/4/SCALE, (float)game.GDX_HEIGHT*3/4/SCALE);
-           
-            Texture fruitTexture = plot.getPlantedTree().getFruit().itemImage;
+            drawTree();
 
             // Draw fruit onto tree
             if (plot.isReadyToHarvest() || harvesting)
             {
-                for (int i = 0; i < fruitBodies.size; i++)
-                {
-                    Body body = fruitBodies.get(i);
-                    Fixture fixture = body.getFixtureList().first();
-                    if (fixture.getFilterData().groupIndex == FRUIT_INDEX)
-                    {
-                        Vector2 position = body.getPosition();
-                        float radius = game.GDX_WIDTH / 20 / SCALE;
-                        batch.draw(fruitTexture, position.x - radius, position.y - radius, radius * 2, radius * 2);
-                    }
-                }
+                drawFruit();
 
                 if (harvesting)
                 {
+                    // Draw basket
                     batch.draw(basketTexture, basketX, basketY, BASKET_WIDTH, BASKET_HEIGHT);
                 }
             }
         }
 
-        //batch.draw(dirtpatch, (float)game.GDX_WIDTH/4/SCALE, game.GDX_HEIGHT/4/SCALE - dirtPatchCenterY, dirtpatch.getWidth()/SCALE, dirtpatch.getHeight()/SCALE);
-        
         batch.end();
 
         // Update and draw stage
         stage.act();
         stage.draw();
 
-        // physDebug.render(physWorld, camera.combined);
+        //physDebug.render(physWorld, camera.combined);
     }
 
     @Override
@@ -519,6 +374,7 @@ public class PlotScreen implements Screen, GestureListener {
     {
         stage.dispose();
         skin.dispose();
+        physWorld.dispose();
     }
 
     public void setPlot(Plot p)
@@ -533,6 +389,64 @@ public class PlotScreen implements Screen, GestureListener {
 
 
     // Helper methods
+
+    private void initUI()
+    {
+        basketTexture = game.getTexture(Arborium.BASKET);
+        basketImage = new Image(basketTexture);
+        basketImage.setSize(BASKET_WIDTH * SCALE, BASKET_HEIGHT * SCALE);
+        basketImage.setPosition(basketX * SCALE, basketY * SCALE);
+        basketImage.setVisible(false);
+        basketImage.addListener(new ClickListener()
+        {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                basketTouched = true;
+                return true;
+            }
+
+            // Send the seed image to its original position
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                basketTouched = false;
+            }
+        });
+        stage.addActor(basketImage);
+
+        // Setup Stack and add to stage
+        stack = new Stack();
+        stack.setFillParent(true);
+        stage.addActor(stack);
+
+        // Setup main table and add to stack
+        table = new Table();
+        table.setFillParent(true);
+        stack.add(table);
+
+        skin = game.getSkin(Arborium.GLASSY_SKIN);
+
+        // Setup tree label, add to table
+        plantedTreeLabel = new Label("", skin);
+        plantedTreeLabel.setAlignment(Align.center);
+        plantedTreeLabel.setFontScale(2);
+        table.add(plantedTreeLabel).width(500);
+        table.row();
+
+        // Setup mature/harvest timer, add to main table.
+        harvestTimer = new Label("", skin);
+        harvestTimer.setAlignment(Align.center);
+        harvestTimer.setFontScale(2);
+        table.add(harvestTimer).width(500).expandX().center().space(25);
+
+        // Setup seed selection table, added to stack later
+        seedSelectTable = new Table();
+        seedSelectTable.setFillParent(true);
+
+        seedSelectList = new List<String>(skin);
+
+        seedSelectScrollPane = new ScrollPane(seedSelectList, skin);
+        seedSelectTable.add(seedSelectScrollPane).size(250, 500);
+    }
 
     private void initializeButtons()
     {
@@ -665,11 +579,14 @@ public class PlotScreen implements Screen, GestureListener {
 
     private void initializeBodies()
     {
-        physWorld.getBodies(fruitBodies);
-        for (Body b : fruitBodies)
+        Array<Body> allBodies = new Array<Body>();
+        physWorld.getBodies(allBodies);
+        for (Body b : allBodies)
         {
             physWorld.destroyBody(b);
         }
+
+        fruitBodies.clear();
 
         CircleShape circle = new CircleShape();
         circle.setRadius(game.GDX_WIDTH/20/SCALE);
@@ -694,6 +611,8 @@ public class PlotScreen implements Screen, GestureListener {
             Body body = physWorld.createBody(bodyDef);
 
             Fixture fixture = body.createFixture(fixtureDef);
+
+            fruitBodies.add(body);
         } 
 
         PolygonShape baskRect = new PolygonShape();
@@ -708,8 +627,6 @@ public class PlotScreen implements Screen, GestureListener {
 
         basketBody = physWorld.createBody(baskBody);
         Fixture fix = basketBody.createFixture(baskFixture);
-
-        physWorld.getBodies(fruitBodies);
 
         circle.dispose();
         baskRect.dispose();
@@ -726,10 +643,125 @@ public class PlotScreen implements Screen, GestureListener {
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
     }
 
-    private boolean basketTouched(float x, float y)
+    private void seedUpdate()
     {
-        Rectangle rect = new Rectangle(basketX, basketY, BASKET_WIDTH, BASKET_HEIGHT);
-        return rect.contains(x, y);
+        int y = game.GDX_HEIGHT - Gdx.input.getY();
+
+        // If the seed is currently on or under the bottom quarter of
+        // the screen, plant the seed and bring back the main table
+        if (y <= 200)
+        {
+            seedImage.setVisible(false);
+            String seedName = seedSelectList.getSelected();
+            Seed seed = game.seedList.get(seedName);
+            plot.plantSeed(seed.treeType);
+            Inventory.takeItem(seedName);
+            stack.add(table);
+            plantButton.setVisible(false);
+            backButton.setVisible(true);
+            seedTouched = false;
+        }
+
+        // Set the seed's y position to where the screen was touched
+        seedImage.setY(y);
+    }
+
+    private void checkForShake()
+    {
+        // Harvest the tree and stop drawing the fruit when the phone
+        // is shaken.
+        float shakeAmt = Math.abs(Gdx.input.getAccelerometerX());
+        if (shakeAmt >= 25)
+        {
+            plot.harvest();
+            for (int i = 0; i < fruitBodies.size(); i++)
+            {
+                Fixture bodyFixture = fruitBodies.get(i).getFixtureList().get(0);
+                if (bodyFixture.getFilterData().groupIndex == FRUIT_INDEX)
+                {
+                    final int seconds = i;
+                    fruitDropTimer.scheduleTask(new Task()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            fruitBodies.get(seconds).setAwake(true);
+                        }
+                    }, seconds);
+                }
+            }
+        }
+    }
+
+    private void updateFruitBodies()
+    {
+        if (fruitDeleteList.size > 0)
+        {
+            for (Body body : fruitDeleteList)
+            {
+            //    physWorld.destroyBody(body);
+            }
+            //fruitDeleteList.clear();
+        }
+
+        int inactiveBodyCount = 0;
+        for (Body b : fruitBodies)
+        {
+            Fixture bodyFixture = b.getFixtureList().first();
+            if (b.isActive() && b.getPosition().y < -100/SCALE)
+            {
+                //fruitOffScreenCount++;
+                b.setActive(false);
+            }
+
+            if (!b.isActive())
+            {
+                inactiveBodyCount++;
+            }
+        }
+
+        if (inactiveBodyCount >= fruitBodies.size())
+        {
+            harvesting = false;
+                initializeBodies();
+
+                // For some reason the harvest button won't work when the screen's unchanged unless the listener is re-added
+                addButtonListeners();
+        }
+    }
+
+    private void drawTree()
+    {
+        float timeSincePlanted = plot.getTimeSincePlanted();
+        float matureTime = plot.getPlantedTree().getMatureTime();
+        int treeFrameIndex = MathUtils.clamp((int)(timeSincePlanted / matureTime * 123), 0, 123);
+
+        String formatIndex = String.format("%03d", treeFrameIndex);
+        Texture treeFrame = game.getTexture(Arborium.TREE_ANIM + formatIndex + ".png");
+
+        batch.draw(
+                treeFrame,
+                (float)game.GDX_WIDTH/8/SCALE,
+                (float)game.GDX_HEIGHT/4/SCALE,
+                (float)game.GDX_WIDTH*3/4/SCALE,
+                (float)game.GDX_HEIGHT*3/4/SCALE);
+    }
+
+    private void drawFruit()
+    {
+        Texture fruitTexture = plot.getPlantedTree().getFruit().itemImage;
+
+        for (int i = 0; i < fruitBodies.size(); i++)
+        {
+            Body body = fruitBodies.get(i);
+            Fixture fixture = body.getFixtureList().first();
+            if (body.isActive() && fixture.getFilterData().groupIndex == FRUIT_INDEX)
+            {
+                Vector2 position = body.getPosition();
+                float radius = game.GDX_WIDTH / 20 / SCALE;
+                batch.draw(fruitTexture, position.x - radius, position.y - radius, radius * 2, radius * 2);
+            }
+        }
     }
 
     @Override

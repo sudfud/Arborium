@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -29,22 +30,23 @@ import java.util.ArrayList;
 
 public class ShopScreen implements Screen
 {
-    private String selectedItemName;
-    private int selectedItemPrice;
-
     // Keeps track of which shop section we're in; either Buy or Sell
-    private String currentSection = "Buy";
 
     private Arborium game;
 
-    // Used to select between buying and selling items
-    SelectBox shopSelectBox;
+    Label columnLabel;
 
-    List<String> itemList;
+    ScrollPane scrollPane;
+    Table itemTable;
+
+    // Used to select between buying and selling items
+    SelectBox<String> shopSelectBox;
+
+    //List<String> itemList;
     Label currencyLabel;
-    Label priceLabel;
-    TextButton buyButton;
+
     TextButton backButton;
+
     Table table;
     Stage stage;
     Skin skin;
@@ -65,7 +67,7 @@ public class ShopScreen implements Screen
         skin = game.getSkin(Arborium.GLASSY_SKIN);
 
         // Set up selection box for buying and selling items (maybe easier to split the two?)
-        shopSelectBox = new SelectBox(skin);
+        shopSelectBox = new SelectBox<String>(skin);
         shopSelectBox.setItems("Buy", "Sell");
         shopSelectBox.setSelected("Buy");
         shopSelectBox.addListener(new ChangeListener() {
@@ -74,15 +76,13 @@ public class ShopScreen implements Screen
             {
                 if (shopSelectBox.getSelected().equals("Buy"))
                 {
-                    setBuyItems();
+                    //setBuyItems();
+                    setupBuyItemList();
                 }
                 else
                 {
-                    itemList.setItems(Inventory.getItems());
+                    setupSellItemList();
                 }
-
-                buyButton.setText((String)shopSelectBox.getSelected());
-                updateLabels();
             }
         });
         table.add(shopSelectBox).width(200);
@@ -94,47 +94,19 @@ public class ShopScreen implements Screen
         currencyLabel.setFontScale(2);
         table.add(currencyLabel).expandX().top().height(100);
         table.row();
+        //table.add(itemList).height(750).width(500).center();
+        //table.row();
 
-        itemList = new List<String>(skin);
-        itemList.getStyle().selection.setTopHeight(16);
-        itemList.getStyle().selection.setBottomHeight(16);
-        itemList.setItems(game.seedList.getSeedNames());
-        itemList.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                updateLabels();
-            }
-        });
-        table.add(itemList).height(750).width(500).center();
+        String columns = String.format("%-15s%-7s%-7s", "Name", "Count", "Price");
+        columnLabel = new Label(columns, skin);
+        columnLabel.setFontScale(2);
+        table.add(columnLabel).width(game.GDX_WIDTH - 100);
         table.row();
 
-        priceLabel = new Label("Price: ", skin);
-        priceLabel.setFontScale(2);
-        updateLabels();
-        table.add(priceLabel).left();
-
-        buyButton = new TextButton("Buy", skin);
-        buyButton.addListener(new ClickListener()
-        {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
-            {
-                if (shopSelectBox.getSelected().equals("Buy") && Currency.subtract(selectedItemPrice))
-                    Inventory.addItem(selectedItemName, 1);
-
-                else
-                {
-                    Currency.add(selectedItemPrice);
-                    Inventory.takeItem(selectedItemName);
-                }
-
-                updateLabels();
-                return true;
-            }
-        });
-        table.add();
-        table.add(buyButton).width(150).height(100);
+        itemTable = new Table(skin);
+        scrollPane = new ScrollPane(itemTable);
+        table.add(scrollPane).height(750).width(game.GDX_WIDTH).center();
+        table.row();
 
         backButton = new TextButton("Back", skin);
         backButton.addListener(new ClickListener()
@@ -156,7 +128,8 @@ public class ShopScreen implements Screen
     public void show()
     {
         Gdx.input.setInputProcessor(stage);
-        updateLabels();
+        shopSelectBox.setSelected("Buy");
+        setupBuyItemList();
     }
 
     @Override
@@ -189,7 +162,7 @@ public class ShopScreen implements Screen
     @Override
     public void resume()
     {
-        updateLabels();
+        shopSelectBox.setSelectedIndex(0);
     }
 
     @Override
@@ -202,59 +175,80 @@ public class ShopScreen implements Screen
 
     }
 
-    private void updateLabels()
-    {
-        if (itemList.getItems().size > 0)
-        {
-            selectedItemName = itemList.getSelected();
-            if (shopSelectBox.getSelected().equals("Sell"))
-            {
-                int cutoff = selectedItemName.indexOf(':');
-                if (cutoff != -1)
-                    selectedItemName = selectedItemName.substring(0, cutoff);
-            }
-            ShopItem item = (ShopItem) Item.lookup(selectedItemName);
-
-            if (shopSelectBox.getSelected().equals("Buy"))
-                selectedItemPrice = item.buyValue;
-            else
-                selectedItemPrice = item.sellValue;
-
-            priceLabel.setText("Price: " + selectedItemPrice);
-
-            int currency = Currency.getAmount();
-            currencyLabel.setText("Currency: " + currency);
-
-            if (shopSelectBox.getSelected().equals("Buy"))
-            {
-                String[] shopItems = Item.getItemsOfType(Seed.class);
-                ArrayList<String> buyableItems = new ArrayList<String>();
-
-                itemList.setItems(shopItems);
-            }
-            else
-            {
-                String[] itemNames = Inventory.getItemsOfType(ShopItem.class);
-                itemList.setItems(itemNames);
-            }
-        }
-    }
-
-    private void setBuyItems()
-    {
-        String[] shopItems = Item.getItemsOfType(Seed.class);
-        ArrayList<String> buyableItems = new ArrayList<String>();
-
-        itemList.setItems(shopItems);
-    }
-
-    private void setSellItems()
-    {
-
-    }
 
     private void back()
     {
         GameUtils.delaySetScreen(game, 0.15f, game.farmScreen);
+    }
+
+    private void setupBuyItemList()
+    {
+        itemTable.clear();
+        String[] items = game.seedList.getSeedNames();
+        for (String item : items)
+        {
+            final ShopItem i = game.seedList.get(item);
+            final String name = i.itemName;
+            final int count = Inventory.containsItem(i) ? Inventory.getCount(name) : 0;
+            final int price = i.buyValue;
+
+            String labelString = String.format("%-15s%-7d%-7d", name, count, price);
+            Label itemLabel = new Label(labelString, skin);
+            itemLabel.setFontScale(2);
+            itemTable.add(itemLabel).width(game.GDX_WIDTH - 100);
+
+            TextButton buyButton = new TextButton("Buy", skin);
+            buyButton.getLabel().setFontScale(0.5f);
+            buyButton.addListener(new ClickListener()
+            {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
+                {
+                    if (Currency.subtract(price))
+                    {
+                        Inventory.addItem(i.itemName, 1);
+                    }
+                    return true;
+                }
+            });
+            itemTable.add(buyButton).width(100);
+
+            itemTable.row();
+        }
+    }
+
+    private void setupSellItemList()
+    {
+        itemTable.clear();
+        String[] invItems = Inventory.getItemsOfType(ShopItem.class);
+        for (String itemName : invItems)
+        {
+            final ShopItem item = (ShopItem)Item.lookup(itemName);
+
+            final int itemCount = Inventory.getCount(itemName);
+            final int sellValue = item.sellValue;
+
+            String itemInfo = itemName + "\t" + sellValue + "\t" + itemCount;
+            Label itemLabel = new Label(itemInfo, skin);
+            itemLabel.setFontScale(2);
+            itemTable.add(itemLabel).width(game.GDX_WIDTH - 100);
+
+            TextButton sellButton = new TextButton("Sell", skin);
+            sellButton.getLabel().setFontScale(0.5f);
+            sellButton.addListener(new ClickListener()
+            {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button)
+                {
+                    Currency.add(sellValue);
+                    Inventory.takeItem(item.itemName);
+                    setupSellItemList();
+                    return true;
+                }
+            });
+
+            itemTable.add(sellButton).width(100);
+            itemTable.row();
+        }
     }
 }
