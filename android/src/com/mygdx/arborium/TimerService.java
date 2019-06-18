@@ -80,22 +80,22 @@ public class TimerService extends Service
 
                     String plotTag = "Plot" + j;
                     //boolean mature = intent.getBooleanExtra(farmTag + plotTag + "Mature", false);
-                    boolean mature = plot.isMature();
-
-                    if (mature)
-                    {
-                        //long lastHarvest = intent.getLongExtra(farmTag + plotTag + "LastHarvest", -1);
-                        //long produceRate = intent.getLongExtra(farmTag + plotTag + "ProduceRate", -1);
-
-                        long lastHarvest = plot.getLastHarvestTime();
-                        long produceRate = plot.getProduceRate();
-
-                        long timeSinceHarvest = TimeUtils.timeSinceMillis(lastHarvest);
-                        if (timeSinceHarvest >= produceRate)
-                        {
-                            harvestReadyCount++;
-                        }
-                    }
+//                    boolean mature = plot.isMature();
+//
+//                    if (mature)
+//                    {
+//                        //long lastHarvest = intent.getLongExtra(farmTag + plotTag + "LastHarvest", -1);
+//                        //long produceRate = intent.getLongExtra(farmTag + plotTag + "ProduceRate", -1);
+//
+//                        long lastHarvest = plot.getLastHarvestTime();
+//                        long produceRate = plot.getProduceRate();
+//
+//                        long timeSinceHarvest = TimeUtils.timeSinceMillis(lastHarvest);
+//                        if (timeSinceHarvest >= produceRate)
+//                        {
+//                            harvestReadyCount++;
+//                        }
+//                    }
                 }
             }
         }

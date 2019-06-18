@@ -48,15 +48,15 @@ public class AndroidLauncher extends AndroidApplication
 							String lastHarvestTag = farmTag + plotTag + "LastHarvest";
 							String produceRateTag = farmTag + plotTag + "ProduceRate";
 
-							boolean mature = plot.isMature();
-							intent.putExtra(matureTag, mature);
-
-							if (mature) {
-								long lastHarvest = plot.getLastHarvestTime();
-								long produceRate = plot.getProduceRate();
-								intent.putExtra(lastHarvestTag, lastHarvest);
-								intent.putExtra(produceRateTag, produceRate);
-							}
+//							boolean mature = plot.isMature();
+//							intent.putExtra(matureTag, mature);
+//
+//							if (mature) {
+//								long lastHarvest = plot.getLastHarvestTime();
+//								long produceRate = plot.getProduceRate();
+//								intent.putExtra(lastHarvestTag, lastHarvest);
+//								intent.putExtra(produceRateTag, produceRate);
+//							}
 						}
 					}
 				}

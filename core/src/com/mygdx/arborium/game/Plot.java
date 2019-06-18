@@ -3,8 +3,10 @@ package com.mygdx.arborium.game;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.arborium.Arborium;
-import com.mygdx.arborium.items.Tree;
-import com.mygdx.arborium.items.TreeList;
+import com.mygdx.arborium.items.Fruit;
+import com.mygdx.arborium.items.Item;
+import com.mygdx.arborium.items.Sapling;
+import com.mygdx.arborium.items.SaplingList;
 
 /*
  * The Plot class handles Tree growth, maturity, and production. Plots can be empty, or they can
@@ -23,13 +25,10 @@ public class Plot
     private Preferences pref = Arborium.preferences;
     String plantTimeKey;
     String harvestKey;
-    String emptyKey;
-    String matureKey;
-    String treeKey;
+    String plotStateKey;
+    String fruitKey;
 
     private int plotNumber;
-
-    boolean empty;
 
     int produceAmount = -1;
     long produceRate = -1;
@@ -42,11 +41,25 @@ public class Plot
     long lastHarvestTime = 0;
     long timeSinceLastHarvest = 0;
 
-    boolean mature;
-    boolean readyToHarvest;
+    Sapling plantedTree = null;
 
-    Tree plantedTree;
     Farm farm;
+
+    public enum PlotState
+    {
+        EMPTY(0),
+        PREMATURE(1),
+        MATURE(2),
+        HARVESTABLE(3);
+
+        public final int value;
+        private PlotState(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    PlotState currentState;
 
     public Plot(Arborium game, int num, Farm farm)
     {
@@ -56,118 +69,125 @@ public class Plot
 
         String farmTag = farm.name;
 
+        updateState(PlotState.EMPTY);
+
         plantTimeKey = farmTag + "Plot" + num + "PlantTime";
         harvestKey = farmTag + "Plot" + num + "LastHarvest";
-        emptyKey = farmTag + "Plot" + num + "Empty";
-        matureKey = farmTag + "Plot" + num + "Mature";
-        treeKey = farmTag + "Plot" + num + "TreeType";
+        plotStateKey = farmTag + "Plot" + num + "State";
+        fruitKey = farmTag + "Plot" + num + "Sapling";
 
-        // Check to see if this plot was already occupied in a previous run.
-        empty = (!pref.contains(emptyKey)) || pref.getBoolean(emptyKey);
-
-        if (empty)
-        {
-            plantedTree = null;
-            mature = false;
-            readyToHarvest = false;
-        }
+        int savedState = pref.getInteger(plotStateKey, 0);
+        updateState(PlotState.values()[savedState]);
 
         // If it was, retrieve the plot's state information from the game's preferences.
-        else
+        if (currentState != PlotState.EMPTY)
         {
-            String treeType = pref.getString(treeKey);
-            plantedTree = game.treeList.get(treeType);
+            String saplingName = pref.getString(fruitKey);
+            plantedTree = (Sapling)Item.lookup(saplingName);
             matureTime = plantedTree.getMatureTime();
             produceRate = plantedTree.getProduceRate();
             produceAmount = plantedTree.getProduceAmount();
 
-            mature = pref.getBoolean(matureKey);
+            // mature = pref.getBoolean(matureKey);
 
             plantedTime = pref.getLong(plantTimeKey);
 
-            if (mature)
+            if (currentState == PlotState.PREMATURE)
             {
-                lastHarvestTime = pref.getLong(harvestKey);
+                timeSincePlanted = TimeUtils.timeSinceMillis(plantedTime);
+                if (timeSincePlanted > matureTime)
+                    updateState(PlotState.MATURE);
             }
 
-            readyToHarvest = false;
+            if (currentState == PlotState.MATURE)
+            {
+                lastHarvestTime = pref.getLong(harvestKey);
+                timeSinceLastHarvest = TimeUtils.timeSinceMillis(lastHarvestTime);
+                if (timeSinceLastHarvest >= produceRate)
+                    updateState(PlotState.HARVESTABLE);
+            }
         }
     }
 
     //
-    public void plantSeed(Tree tree)
+    public void plantSapling(Sapling tree)
     {
-        plantedTree = tree;
-        produceAmount = plantedTree.getProduceAmount();
-        produceRate = plantedTree.getProduceRate();
-        matureTime = plantedTree.getMatureTime();
+        produceAmount = tree.getProduceAmount();
+        produceRate = tree.getProduceRate();
+        matureTime = tree.getMatureTime();
         plantedTime = TimeUtils.millis();
-        empty = false;
+        updateState(PlotState.PREMATURE);
 
-        pref.putBoolean(emptyKey, false);
-        pref.putBoolean(matureKey, false);
+        plantedTree = tree;
+
         pref.putLong(plantTimeKey, plantedTime);
-        pref.putString(treeKey, plantedTree.itemName);
         pref.putLong(harvestKey, plantedTime);
+        pref.putString(fruitKey, tree.itemName);
         pref.flush();
     }
 
     // Call this in the render() method
     public void update()
     {
-        if (!empty)
+        switch(currentState)
         {
-            timeSincePlanted = TimeUtils.timeSinceMillis(plantedTime);
+            case EMPTY:
+                break;
 
-            if (!mature && timeSincePlanted > matureTime)
-            {
-                mature = true;
-                lastHarvestTime = TimeUtils.millis();
-                pref.putBoolean(matureKey, true);
-                pref.flush();
-            }
+            case PREMATURE:
+                timeSincePlanted = TimeUtils.timeSinceMillis(plantedTime);
+                if (timeSincePlanted > matureTime)
+                {
+                    //mature = true;
+                    updateState(PlotState.MATURE);
+                    lastHarvestTime = TimeUtils.millis();
+                }
+                break;
 
-            else if (mature)
-            {
+            case MATURE:
+            case HARVESTABLE:
                 timeSinceLastHarvest = TimeUtils.timeSinceMillis(lastHarvestTime);
-
-                if (timeSinceLastHarvest > produceRate)
-                    readyToHarvest = true;
-            }
+                if (currentState != PlotState.HARVESTABLE && timeSinceLastHarvest > produceRate)
+                {
+                    updateState(PlotState.HARVESTABLE);
+                }
+                break;
         }
     }
 
     public void harvest()
     {
-        if (readyToHarvest)
+        if (currentState == PlotState.HARVESTABLE)
         {
             timeSinceLastHarvest = 0;
             lastHarvestTime = TimeUtils.millis();
-            readyToHarvest = false;
 
+            updateState(PlotState.MATURE);
             pref.putLong(harvestKey, lastHarvestTime);
             pref.flush();
         }
     }
 
-    public boolean isEmpty()
+    private void updateState(PlotState state)
     {
-        return empty;
+        currentState = state;
+        pref.putInteger(plotStateKey, currentState.value);
+        pref.flush();
     }
 
-    public Tree getPlantedTree()
+    public PlotState getCurrentState()
+    {
+        return currentState;
+    }
+
+    public long getMatureTime()
+    {
+        return matureTime;
+    }
+
+    public Sapling getPlantedTree()
     {
         return plantedTree;
-    }
-
-    public boolean isReadyToHarvest()
-    {
-        return readyToHarvest;
-    }
-
-    public boolean isMature()
-    {
-        return mature;
     }
 
     public long getTimeSinceLastHarvest()

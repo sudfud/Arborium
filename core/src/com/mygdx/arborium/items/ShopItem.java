@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
  * either be locked or unlocked. If an Item can only be bought, the sell value should be -1, and
  * vice versa.
  *
- * Subclasses: Fruit, Seed
- *
  */
 
 public abstract class ShopItem extends SpriteItem
@@ -18,9 +16,12 @@ public abstract class ShopItem extends SpriteItem
 
     private boolean locked;
 
-    public ShopItem(int id, String name, Texture image, int buyValue, int sellValue, boolean locked)
+    public final String description;
+
+    public ShopItem(int id, String name, Texture image, String description, int buyValue, int sellValue, boolean locked)
     {
         super(id, name, image);
+        this.description = description;
         this.buyValue = buyValue;
         this.sellValue = sellValue;
         this.locked = locked;

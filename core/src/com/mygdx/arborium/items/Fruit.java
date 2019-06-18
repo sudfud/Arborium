@@ -4,11 +4,20 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Fruit extends ShopItem
 {
-    private int sellValue;
-    private int seedCount;
-
-    public Fruit(int id, String name, Texture image, int buyValue, int sellValue)
+    public enum FruitType
     {
-        super(id, name, image, buyValue, sellValue, false);
+        APPLE(0),
+        ORANGE(1);
+
+        int value;
+
+        FruitType(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public Fruit(int id, String name, Texture image, int sellValue, boolean locked) {
+        super(id, name, image, "", -1, sellValue, locked);
     }
 }

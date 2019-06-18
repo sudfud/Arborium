@@ -1,0 +1,153 @@
+{
+BitmapFont: {
+	comic: {
+		file: comic.fnt
+	}
+	comic-large: {
+		file: comic-large.fnt
+	}
+	comic-v-large: {
+		file: comic-v-large.fnt
+	}
+	dpcomic-28: {
+		file: dpcomic.fnt
+	}
+	dpcomic-36: {
+		file: dpcomic.fnt
+	}
+	eight: {
+		file: 8-BIT WONDER.fnt
+	}
+	eight-large: {
+		file: 8-BIT WONDER.fnt
+	}
+}
+Color: {
+	RGBA_0_0_0_255: {
+		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+	RGBA_209_209_209_255: {
+		r: 0.82
+		g: 0.82
+		b: 0.82
+		a: 1
+	}
+	RGBA_255_255_255_255: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+	RGBA_99_99_99_255: {
+		r: 0.39
+		g: 0.39
+		b: 0.39
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Container: {
+	default: {
+		background: space
+	}
+}
+ButtonStyle: {
+	left: {
+		up: button_left2x
+	}
+	right: {
+		up: button_right2x
+	}
+}
+CheckBoxStyle: {
+	default: {
+		checkboxOn: checked_box
+		checkboxOff: unchecked_box
+		font: dpcomic-36
+	}
+}
+ImageTextButtonStyle: {
+	default: {
+		imageUp: tree2
+		font: comic-v-large
+	}
+	title: {
+		imageUp: tree2
+		font: comic-v-large
+		pressedOffsetX: 4
+		checkedOffsetX: 4
+	}
+	apple: {
+		imageUp: apple (2)
+		font: comic-v-large
+	}
+	orange: {
+		imageUp: orange
+		font: comic-v-large
+	}
+}
+LabelStyle: {
+	default: {
+		font: dpcomic-36
+	}
+}
+ListStyle: {
+	default: {
+		font: dpcomic-36
+		fontColorSelected: RGBA_99_99_99_255
+		fontColorUnselected: RGBA_255_255_255_255
+		selection: space_inlay
+		background: space
+	}
+}
+ScrollPaneStyle: {
+	default: {
+		background: space
+	}
+}
+SelectBoxStyle: {
+	default: {
+		font: dpcomic-36
+		fontColor: RGBA_99_99_99_255
+		background: space_inlay
+		scrollStyle: default
+		listStyle: default
+	}
+}
+SplitPaneStyle: {
+	default-horizontal: {
+		handle: space
+	}
+}
+TextButtonStyle: {
+	default: {
+		font: dpcomic-36
+		disabledFontColor: RGBA_99_99_99_255
+		up: blue
+		down: blue_pressed
+		disabled: blue_pressed
+		pressedOffsetY: 2
+		checkedOffsetY: 2
+	}
+}
+TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+TouchpadStyle: {
+	default: {
+		background: space
+		knob: apple (2)
+	}
+}
+WindowStyle: {
+	default: {
+		background: space
+		titleFont: comic-large
+		titleFontColor: RGBA_255_255_255_255
+	}
+}
+}

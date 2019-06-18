@@ -1,34 +1,28 @@
 package com.mygdx.arborium.items;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.arborium.Arborium;
-import com.mygdx.arborium.Resources;
 
 import java.util.HashMap;
 
 public class FruitList
 {
-    private HashMap<String, Fruit> fruitMap;
+    static HashMap<Fruit.FruitType, Fruit> fruitMap;
 
-    public Fruit apple;
-    public Fruit orange;
+    final Fruit apple;
+    final Fruit orange;
 
     public FruitList(Arborium game)
     {
-        Texture appleTexture = game.getTexture(Arborium.APPLE_FRUIT);
-        Texture orangeTexture = game.getTexture(Arborium.ORANGE_FRUIT);
+        fruitMap = new HashMap<Fruit.FruitType, Fruit>();
 
-        apple = new Fruit(64, "Apple Fruit", appleTexture, -1, 10);
-        orange = new Fruit(65, "Orange Fruit", orangeTexture, -1, 25);
+        apple = new Fruit(1, "Apple", game.getTexture(Arborium.APPLE_FRUIT), 50, false);
+        orange = new Fruit(2, "Orange", game.getTexture(Arborium.ORANGE_FRUIT), 75, false);
 
-        fruitMap = new HashMap<String, Fruit>();
-
-        fruitMap.put(apple.itemName, apple);
-        fruitMap.put(orange.itemName, orange);
+        fruitMap.put(Fruit.FruitType.APPLE, apple);
     }
 
-    public Fruit get(String name)
+    public static Fruit get(Fruit.FruitType type)
     {
-        return fruitMap.get(name);
+        return fruitMap.get(type);
     }
 }

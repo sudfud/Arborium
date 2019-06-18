@@ -1,5 +1,7 @@
 package com.mygdx.arborium.items;
 
+import com.badlogic.gdx.graphics.Texture;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,14 +19,16 @@ public abstract class Item
 
     public final String itemName;
 
-    private static HashMap<String, Item> itemLookup = new HashMap<String, Item>();
+    private static HashMap<String, Item> nameItemLookup = new HashMap<String, Item>();
+    private static HashMap<Integer, Item> idItemLookup = new HashMap<Integer, Item>();
 
     public Item(int id, String name)
     {
         this.id = id;
         this.itemName = name;
 
-        itemLookup.put(this.itemName, this);
+        nameItemLookup.put(this.itemName, this);
+        idItemLookup.put(this.id, this);
     }
 
     public int getId()
@@ -48,13 +52,13 @@ public abstract class Item
 
     public static Item lookup(String name)
     {
-        return itemLookup.get(name);
+        return nameItemLookup.get(name);
     }
 
     // Returns the list of names of *all* items matching the given type.
     public static String[] getItemsOfType(Class<?> type)
     {
-        String[] allItems = itemLookup.keySet().toArray(new String[itemLookup.size()]);
+        String[] allItems = nameItemLookup.keySet().toArray(new String[nameItemLookup.size()]);
         ArrayList<String> matchingItems = new ArrayList<String>();
 
         for (String key : allItems)
@@ -67,5 +71,11 @@ public abstract class Item
         }
 
         return matchingItems.toArray(new String[matchingItems.size()]);
+    }
+
+    @Override
+    public String toString()
+    {
+        return itemName;
     }
 }

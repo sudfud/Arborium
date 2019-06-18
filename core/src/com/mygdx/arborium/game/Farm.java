@@ -15,12 +15,12 @@ public class Farm
 
     Plot[] plots;
 
-    public Farm(Arborium game, String name, boolean locked)
+    public Farm(Arborium game, String name, int plotCount, boolean locked)
     {
         this.name = name;
         this.locked = locked;
 
-        plots = new Plot[9];
+        plots = new Plot[plotCount];
         for (int i = 0; i < plots.length; i++)
             plots[i] = new Plot(game, i, this);
     }

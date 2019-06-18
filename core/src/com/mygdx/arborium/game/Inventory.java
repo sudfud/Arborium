@@ -4,13 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.arborium.items.Item;
-import com.mygdx.arborium.items.SeedList;
 
 import java.util.ArrayList;
 import com.mygdx.arborium.Arborium;
 
 import java.util.HashMap;
-import java.util.Set;
 
 /*
  * The game's inventory is managed by a hashmap with String keys and Integer values.

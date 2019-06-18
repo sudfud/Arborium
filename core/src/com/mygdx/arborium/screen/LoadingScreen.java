@@ -36,20 +36,22 @@ public class LoadingScreen implements Screen
     public void show() 
     {
         game.assetManager.load(Arborium.GLASSY_SKIN, Skin.class);
+        game.assetManager.load(Arborium.ARBOR_SKIN, Skin.class);
 
         game.assetManager.load(Arborium.BG_SKY, Texture.class);
+        game.assetManager.load(Arborium.CLOUD, Texture.class);
 
         game.assetManager.load(Arborium.GRASS, Texture.class);
         game.assetManager.load(Arborium.DIRT_PATCH, Texture.class);
-        game.assetManager.load(Arborium.DIRT_PLOT, Texture.class);
+        game.assetManager.load(Arborium.PLOT, Texture.class);
+        game.assetManager.load(Arborium.PLOT2X, Texture.class);
 
+        game.assetManager.load(Arborium.PLANT, Texture.class);
+        game.assetManager.load(Arborium.TREE_DEFAULT, Texture.class);
+        game.assetManager.load(Arborium.TREE_DEFAULT2X, Texture.class);
+        game.assetManager.load(Arborium.APPLE_TREE2X, Texture.class);
+        game.assetManager.load(Arborium.ORANGE_TREE2X, Texture.class);
         game.assetManager.load(Arborium.TREE_OVERWORLD, Texture.class);
-
-        game.assetManager.load(Arborium.TREE_1_ADULT, Texture.class);
-        game.assetManager.load(Arborium.TREE_1_YOUNG_ADULT, Texture.class);
-        game.assetManager.load(Arborium.TREE_1_TEENAGER, Texture.class);
-        game.assetManager.load(Arborium.TREE_1_CHILD, Texture.class);
-        game.assetManager.load(Arborium.TREE_1_BABY, Texture.class);
 
         game.assetManager.load(Arborium.APPLE_SEED, Texture.class);
         game.assetManager.load(Arborium.ORANGE_SEED, Texture.class);
@@ -60,6 +62,8 @@ public class LoadingScreen implements Screen
 
         game.assetManager.load(Arborium.BASKET, Texture.class);
 
+        game.assetManager.load(Arborium.COIN, Texture.class);
+
         for (int i = 0; i <= 123; i++)
         {
             String formatInt = String.format("%03d", i);
@@ -67,9 +71,11 @@ public class LoadingScreen implements Screen
         }
 
         game.assetManager.finishLoadingAsset(Arborium.GLASSY_SKIN);
+        game.assetManager.finishLoadingAsset(Arborium.ARBOR_SKIN);
         game.assetManager.finishLoadingAsset(Arborium.BG_SKY);
+        game.assetManager.finishLoadingAsset(Arborium.CLOUD);
 
-        Skin skin = game.getSkin(Arborium.GLASSY_SKIN);
+        Skin skin = game.getSkin(Arborium.ARBOR_SKIN);
 
         stage = new Stage(new ScreenViewport());
 
@@ -87,18 +93,15 @@ public class LoadingScreen implements Screen
     @Override
     public void render(float delta) 
     {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        // Clear screen
+        Gdx.gl.glClearColor(100/255f, 1, 244/255f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         if (game.assetManager.update())
         {
             game.initializeScreens();
-            game.setScreen(game.mainMenuScreen);
+            game.setScreen(new MainMenuScreen(game));
         }
-
-        game.spriteBatch.begin();
-        game.spriteBatch.draw(backgroundTexture, 0, 0);
-        game.spriteBatch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(new Color(0, 0.3f, 0.8f, 1));

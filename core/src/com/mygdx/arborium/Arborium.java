@@ -11,12 +11,10 @@ import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Farm;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.items.FruitList;
-import com.mygdx.arborium.items.SeedList;
-import com.mygdx.arborium.items.TreeList;
-import com.mygdx.arborium.screen.FarmScreen;
+import com.mygdx.arborium.items.SaplingList;
 import com.mygdx.arborium.screen.LoadingScreen;
 import com.mygdx.arborium.screen.MainMenuScreen;
-import com.mygdx.arborium.screen.PlotScreen;
+import com.mygdx.arborium.screen.NewFarmScreen;
 import com.mygdx.arborium.screen.ShopScreen;
 
 
@@ -31,29 +29,39 @@ import com.mygdx.arborium.screen.ShopScreen;
 public class Arborium extends Game
 {
 	public static final String GLASSY_SKIN = "glassy-ui.json";
+	public static final String ARBOR_SKIN = "arborium_ui.json";
+
+	public static final String CLOUD = "cloud (1).png";
 
     public static final String BG_SKY = "background_sky.png";
     public static final String GRASS = "grass.png";
     public static final String DIRT_PATCH = "dirtpatch.png";
-    public static final String DIRT_PLOT = "dirtplot.png";
+	public static final String PLOT = "plot.png";
+	public static final String PLOT2X = "plot2x.png";
 
     public static final String TREE_OVERWORLD = "tree-overworld.png";
 
-    public static final String TREE_1_ADULT = "tree1_adult.png";
-    public static final String TREE_1_YOUNG_ADULT = "tree1_youngadult.png";
-    public static final String TREE_1_TEENAGER = "tree1_teenager.png";
-    public static final String TREE_1_CHILD = "tree1_child.png";
-    public static final String TREE_1_BABY = "tree1_baby.png";
+	public static final String PLANT = "plant2x.png";
+	public static final String TREE_DEFAULT = "tree.png";
+	public static final String TREE_DEFAULT2X = "tree2x.png";
+
+	public static final String APPLE_TREE = "apple_tree.png";
+	public static final String APPLE_TREE2X = "apple_tree2x.png";
+
+	public static final String ORANGE_TREE = "orange_tree.png";
+	public static final String ORANGE_TREE2X = "orange_tree2x.png";
 
     public static final String APPLE_SEED = "seed1.png";
     public static final String ORANGE_SEED = "seed2.png";
 
-    public static final String APPLE_FRUIT = "fruits/red-apple.png";
-	public static final String ORANGE_FRUIT = "fruits/orange.png";
+    public static final String APPLE_FRUIT = "apple.png";
+	public static final String ORANGE_FRUIT = "orange.png";
 	
 	public static final String BASKET = "basket.png";
 
-    public static final String TREE_ANIM = "Tree2/sprite_tree_2";
+	public static final String TREE_ANIM = "Tree2/sprite_tree_2";
+	
+	public static final String COIN = "coin.png";
 
 	public int GDX_WIDTH;
 	public int GDX_HEIGHT;
@@ -64,19 +72,17 @@ public class Arborium extends Game
 
 	public AssetManager assetManager;
 
-	public FruitList fruitList;
-	public TreeList treeList;
-	public SeedList seedList;
-
 	public LoadingScreen loadingScreen;
-	public FarmScreen farmScreen;
-	public PlotScreen plotScreen;
 	public MainMenuScreen mainMenuScreen;
+	public NewFarmScreen farmScreen;
 	public ShopScreen shopScreen;
 
 	public Farm[] mediumFarms;
 	public Farm[] smallFarms;
 	public Farm largeFarm;
+
+	FruitList fruitList;
+	SaplingList saplingList;
 
 	private boolean notificationsEnabled = true;
 
@@ -96,6 +102,8 @@ public class Arborium extends Game
 
 		Currency.initialize();
 		Inventory.initialize(this);
+		Inventory.addItem("Apple Tree", 5);
+		Inventory.addItem("Orange Tree", 5);
 
 		loadingScreen = new LoadingScreen(this);
 		setScreen(loadingScreen);
@@ -103,32 +111,11 @@ public class Arborium extends Game
 
 	public void initializeScreens()
 	{
-		// fruitList should be initialized first and seedList last.
-		// treeList depends on fruitList and seedList depends on treeList.
 		fruitList = new FruitList(this);
-		treeList = new TreeList(this);
-		seedList = new SeedList(this);
-
-		mediumFarms = new Farm[2];
-		for (int i = 0; i < mediumFarms.length; i++)
-		{
-			mediumFarms[i] = new Farm(this, "MediumFarm" + i, true, 8);
-		}
-		mediumFarms[0].setLock(false);
-
-		smallFarms = new Farm[4];
-		for (int i = 0; i < smallFarms.length; i++)
-		{
-			smallFarms[i] = new Farm(this, "SmallFarm" + i, true, 4);
-		}
-
-		largeFarm = new Farm(this, "LargeFarm0", true, 16);
-
-		farmScreen = new FarmScreen(this);
-
-		plotScreen = new PlotScreen(this, mediumFarms[0].getPlot(0));
+		saplingList = new SaplingList(this);
 
 		mainMenuScreen = new MainMenuScreen(this);
+		farmScreen = new NewFarmScreen(this, "arborMap2.tmx", 0);
 		shopScreen = new ShopScreen(this);
 	}
 
@@ -145,9 +132,9 @@ public class Arborium extends Game
         spriteBatch.dispose();
 
         mainMenuScreen.dispose();
-        shopScreen.dispose();
-		farmScreen.dispose();
-		plotScreen.dispose();
+        //shopScreen.dispose();
+		//farmScreen.dispose();
+		//plotScreen.dispose();
     }
 
     public void setNotificationHandler(NotificationHandler handler)
