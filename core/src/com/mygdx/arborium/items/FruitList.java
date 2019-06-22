@@ -19,6 +19,7 @@ public class FruitList
         orange = new Fruit(2, "Orange", game.getTexture(Arborium.ORANGE_FRUIT), 75, false);
 
         fruitMap.put(Fruit.FruitType.APPLE, apple);
+        fruitMap.put(Fruit.FruitType.ORANGE, orange);
     }
 
     public static Fruit get(Fruit.FruitType type)

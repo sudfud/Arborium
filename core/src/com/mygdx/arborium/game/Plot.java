@@ -163,6 +163,7 @@ public class Plot
             lastHarvestTime = TimeUtils.millis();
 
             updateState(PlotState.MATURE);
+            Inventory.addItem(plantedTree.getProduce().itemName, plantedTree.getProduceAmount());
             pref.putLong(harvestKey, lastHarvestTime);
             pref.flush();
         }

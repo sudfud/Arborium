@@ -54,8 +54,8 @@ public class Arborium extends Game
     public static final String APPLE_SEED = "seed1.png";
     public static final String ORANGE_SEED = "seed2.png";
 
-    public static final String APPLE_FRUIT = "apple.png";
-	public static final String ORANGE_FRUIT = "orange.png";
+    public static final String APPLE_FRUIT = "apple2x.png";
+	public static final String ORANGE_FRUIT = "orange2x.png";
 	
 	public static final String BASKET = "basket.png";
 
@@ -102,8 +102,6 @@ public class Arborium extends Game
 
 		Currency.initialize();
 		Inventory.initialize(this);
-		Inventory.addItem("Apple Tree", 5);
-		Inventory.addItem("Orange Tree", 5);
 
 		loadingScreen = new LoadingScreen(this);
 		setScreen(loadingScreen);

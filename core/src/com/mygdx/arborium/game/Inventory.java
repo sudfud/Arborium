@@ -79,13 +79,18 @@ public class Inventory
 
     public static void takeItem(String itemName)
     {
+        takeItem(itemName, 1);
+    }
+
+    public static void takeItem(String itemName, int count)
+    {
         if (inventory.containsKey(itemName))
         {
             int amt = inventory.get(itemName);
-            if (amt == 1)
+            if (amt <= 1)
                 inventory.remove(itemName);
             else
-                inventory.put(itemName, amt - 1);
+                inventory.put(itemName, amt - count);
         }
         updateInventory();
     }

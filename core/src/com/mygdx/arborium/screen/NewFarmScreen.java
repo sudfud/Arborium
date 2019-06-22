@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
+import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Farm;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.game.Plot;
@@ -40,6 +41,7 @@ import com.mygdx.arborium.items.Item;
 import com.mygdx.arborium.items.Sapling;
 import com.mygdx.arborium.items.SaplingList;
 import com.mygdx.arborium.items.Fruit.FruitType;
+import com.mygdx.arborium.ui.PriceLabel;
 
 public class NewFarmScreen implements Screen, GestureListener 
 {
@@ -62,9 +64,7 @@ public class NewFarmScreen implements Screen, GestureListener
     Skin skin;
 
     Table backTable;
-    HorizontalGroup currencyGroup;
-    Image coinIcon;
-    Label currencyLabel;
+    PriceLabel currencyLabel;
     TextButton menuButton;
     TextButton shopButton;
 
@@ -166,6 +166,8 @@ public class NewFarmScreen implements Screen, GestureListener
         Gdx.input.setInputProcessor(im);
         //Gdx.input.setInputProcessor(stage);
 
+        updateSaplingList();
+
         // Center camera on the farm map
         camera.position.set(map.getProperties().get("width", Integer.class) / 2f,
                 map.getProperties().get("height", Integer.class) / 2f, 0);
@@ -236,17 +238,11 @@ public class NewFarmScreen implements Screen, GestureListener
         // Background table initialization
 
         backTable = new Table();
-        currencyGroup = new HorizontalGroup();
-        coinIcon = new Image(game.getTexture(Arborium.COIN));
-        currencyLabel = new Label("9999999", skin);
+        currencyLabel = new PriceLabel(game);
         menuButton = new TextButton("Menu", skin);
         shopButton = new TextButton("Shop", skin);
 
         backTable.setFillParent(true);
-        
-        currencyGroup.space(25);
-        currencyGroup.addActor(coinIcon);
-        currencyGroup.addActor(currencyLabel);
 
         menuButton.addListener(new ClickListener()
         {
@@ -265,7 +261,7 @@ public class NewFarmScreen implements Screen, GestureListener
             }
         });
 
-        backTable.add(currencyGroup).colspan(2).expand().top().right();
+        backTable.add(currencyLabel).colspan(2).expand().top().right();
         backTable.row();
         backTable.add(menuButton).expand().bottom().left().width(200).height(100);
         backTable.add(shopButton).expand().bottom().right().width(200).height(100);
@@ -288,29 +284,31 @@ public class NewFarmScreen implements Screen, GestureListener
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                Sapling selectedSeed = saplingList.getSelected();
-                seedImage.setDrawable(new TextureRegionDrawable(selectedSeed.itemImage));
+                if (saplingList.getItems().size > 0)
+                {
+                    Sapling selectedSeed = saplingList.getSelected();
+                    seedImage.setDrawable(new TextureRegionDrawable(selectedSeed.itemImage));
+                }
+                else
+                    seedImage.clear();
             }
         });
 
-        String[] seedStrings = Inventory.getItemsOfType(Sapling.class);
-        Sapling[] seeds = new Sapling[seedStrings.length];
-
-        for (int i = 0; i < seeds.length; i++)
-        {
-            seeds[i] = (Sapling)Item.lookup(seedStrings[i]);
-        }
-
-        saplingList.setItems(seeds);
+        updateSaplingList();
 
         plantConfirmButton.addListener(new ClickListener()
         {
             public void clicked(InputEvent event, float x, float y)
             {
-                Sapling selectSapling = saplingList.getSelected();
-                Plot plot = farm.getPlot(selectedPlot);
-                plot.plantSapling(selectSapling);
-                windowContainer.remove();
+                if (!saplingList.getItems().isEmpty())
+                {
+                    Sapling selectSapling = saplingList.getSelected();
+                    Plot plot = farm.getPlot(selectedPlot);
+                    plot.plantSapling(selectSapling);
+                    Inventory.takeItem(selectSapling.itemName);
+                    windowContainer.remove();
+                    updateSaplingList();
+                }
             }
         });
 
@@ -479,22 +477,37 @@ public class NewFarmScreen implements Screen, GestureListener
                 break;
         }
 
+        currencyLabel.setText("" + Currency.getAmount());
+
         plotInfoLabel.setText(info);
         plotInfoTime.setText(time);
 
         plotInfoWindow.invalidate();
     }
 
-        // Use this to convert time in milliseconds to a more human-readable format
-        private String timeFormat(long millis)
+    private void updateSaplingList()
+    {
+        String[] seedStrings = Inventory.getItemsOfType(Sapling.class);
+        Sapling[] seeds = new Sapling[seedStrings.length];
+
+        for (int i = 0; i < seeds.length; i++)
         {
-            return String.format("%02d:%02d:%02d",
-                    TimeUnit.MILLISECONDS.toHours(millis),
-                    TimeUnit.MILLISECONDS.toMinutes(millis) -
-                    TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), // The change is in this line
-                    TimeUnit.MILLISECONDS.toSeconds(millis) -
-                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+            seeds[i] = (Sapling)Item.lookup(seedStrings[i]);
         }
+
+        saplingList.setItems(seeds);
+    }
+
+    // Use this to convert time in milliseconds to a more human-readable format
+    private String timeFormat(long millis)
+    {
+        return String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) -
+                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), // The change is in this line
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+    }
 
     @Override
     public void resize(int width, int height) {
