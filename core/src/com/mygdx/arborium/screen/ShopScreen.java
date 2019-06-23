@@ -2,7 +2,9 @@ package com.mygdx.arborium.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.game.Currency;
@@ -40,6 +43,8 @@ public class ShopScreen implements Screen
     boolean buying = true;
 
     final Arborium game;
+
+    OrthographicCamera camera;
 
     Stage stage;
     Skin skin;
@@ -167,7 +172,10 @@ public class ShopScreen implements Screen
 
     private void initialize()
     {
-        stage = new Stage(new ScreenViewport());
+        camera = new OrthographicCamera();
+        //camera.setToOrtho();
+
+        stage = new Stage(new FitViewport(800, 480));
         skin = game.getSkin(Arborium.ARBOR_SKIN);
 
         shopTable = new Table();

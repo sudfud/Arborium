@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.arborium.Arborium;
 
 public class MainMenuScreen implements Screen
@@ -66,9 +69,10 @@ public class MainMenuScreen implements Screen
         //skin.getFont("comic").getData().setScale(2);
 
         // Setup stage and table
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new ExtendViewport(800, 480));
         table = new Table();
         table.setFillParent(true);
+        table.setDebug(true);
         stage.addActor(table);
         stage.addActor(cloudImage);
 
@@ -104,7 +108,7 @@ public class MainMenuScreen implements Screen
             }
         });
         table.row();
-        table.add(quitButton).width(200).height(100);
+        table.add(quitButton).width(200).height(100).expand().bottom();
 
         arborAtlas = new TextureAtlas("arborium.atlas");
         //cloudParticles = new ParticleEffect();

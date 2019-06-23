@@ -31,6 +31,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.game.Currency;
@@ -108,9 +111,9 @@ public class NewFarmScreen implements Screen, GestureListener
 
         // Initialize camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 10, 15);
+        camera.setToOrtho(false, 480/32f, 800/32f);
 
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new ExtendViewport(800, 480));
         skin = game.getSkin(Arborium.ARBOR_SKIN);
 
         map = new TmxMapLoader().load(mapName);
@@ -243,6 +246,7 @@ public class NewFarmScreen implements Screen, GestureListener
         shopButton = new TextButton("Shop", skin);
 
         backTable.setFillParent(true);
+        backTable.setDebug(true);
 
         menuButton.addListener(new ClickListener()
         {
@@ -261,10 +265,11 @@ public class NewFarmScreen implements Screen, GestureListener
             }
         });
 
-        backTable.add(currencyLabel).colspan(2).expand().top().right();
-        backTable.row();
-        backTable.add(menuButton).expand().bottom().left().width(200).height(100);
-        backTable.add(shopButton).expand().bottom().right().width(200).height(100);
+        //backTable.add(currencyLabel).colspan(2).expand().top().right();
+        //backTable.row();
+        //backTable.add(menuButton).expandY().bottom().left().width(200).height(100);
+        //backTable.add(shopButton).expand().bottom().right().width(200).height(100);
+        backTable.add(menuButton).expand().bottom();
 
         stage.addActor(backTable);
 
