@@ -1,0 +1,146 @@
+
+Arborium.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+apple2x
+  rotate: false
+  xy: 262, 376
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+apple_small
+  rotate: false
+  xy: 2, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+apple_tree
+  rotate: false
+  xy: 392, 342
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: -1
+apple_tree2x
+  rotate: false
+  xy: 132, 344
+  size: 128, 160
+  orig: 128, 160
+  offset: 0, 0
+  index: -1
+cherry
+  rotate: false
+  xy: 262, 98
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+cherry2x
+  rotate: false
+  xy: 132, 214
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+cherry_small
+  rotate: false
+  xy: 198, 66
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cherry_tree
+  rotate: false
+  xy: 392, 424
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: -1
+cherry_tree2x
+  rotate: false
+  xy: 2, 344
+  size: 128, 160
+  orig: 128, 160
+  offset: 0, 0
+  index: -1
+cloud (1)
+  rotate: false
+  xy: 458, 472
+  size: 40, 32
+  orig: 40, 32
+  offset: 0, 0
+  index: -1
+orange
+  rotate: false
+  xy: 328, 180
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+orange2x
+  rotate: false
+  xy: 262, 246
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+orange_small
+  rotate: false
+  xy: 328, 162
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+orange_tree
+  rotate: false
+  xy: 262, 164
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: -1
+orange tree
+  rotate: false
+  xy: 262, 164
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: -1
+orange_tree2x
+  rotate: false
+  xy: 2, 182
+  size: 128, 160
+  orig: 128, 160
+  offset: 0, 0
+  index: -1
+plant
+  rotate: false
+  xy: 392, 260
+  size: 64, 80
+  orig: 64, 80
+  offset: 0, 0
+  index: -1
+plant2x
+  rotate: false
+  xy: 2, 20
+  size: 128, 160
+  orig: 128, 160
+  offset: 0, 0
+  index: -1
+plot
+  rotate: false
+  xy: 132, 18
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+plot2x
+  rotate: false
+  xy: 132, 84
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
