@@ -110,8 +110,8 @@ public class NewFarmScreen implements Screen, GestureListener
         this.game = game;
 
         // Initialize camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480/32f, 800/32f);
+       // camera = new OrthographicCamera();
+       // camera.setToOrtho(false, 480/48f, 800/48f);
 
         stage = new Stage(new ExtendViewport(800, 480));
         skin = game.getSkin(Arborium.ARBOR_SKIN);
@@ -145,7 +145,7 @@ public class NewFarmScreen implements Screen, GestureListener
         plainTreeDrawable = new TextureRegionDrawable(game.getTexture(Arborium.TREE_DEFAULT2X));
 
         treeParticleMap = new HashMap<Sapling,TextureAtlas>();
-        fruitParticles = new TextureAtlas("apple.atlas");
+        fruitParticles = new TextureAtlas("particles.atlas");
         //orangeParticle = new TextureAtlas(Arborium.ORANGE_FRUIT);
 
         //treeParticleMap.put(SaplingList.get(FruitType.APPLE), appleParticle);
@@ -172,11 +172,6 @@ public class NewFarmScreen implements Screen, GestureListener
         updateSaplingList();
 
         // Center camera on the farm map
-        camera.position.set(map.getProperties().get("width", Integer.class) / 2f,
-                map.getProperties().get("height", Integer.class) / 2f, 0);
-        camera.update();
-
-        mapRenderer.setView(camera);
     }
 
     @Override
@@ -265,11 +260,10 @@ public class NewFarmScreen implements Screen, GestureListener
             }
         });
 
-        //backTable.add(currencyLabel).colspan(2).expand().top().right();
-        //backTable.row();
-        //backTable.add(menuButton).expandY().bottom().left().width(200).height(100);
-        //backTable.add(shopButton).expand().bottom().right().width(200).height(100);
-        backTable.add(menuButton).expand().bottom();
+        backTable.add(currencyLabel).expand().colspan(2).top().space(50);
+        backTable.row();
+        backTable.add(menuButton).expand().bottom().left().size(100, 50);
+        backTable.add(shopButton).expand().bottom().right().size(100, 50);
 
         stage.addActor(backTable);
 
@@ -515,8 +509,17 @@ public class NewFarmScreen implements Screen, GestureListener
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width, int height)
+    {
+        float aspectRatio = (float) width / (float) height;
+        camera = new OrthographicCamera(2f * aspectRatio, 2f);
+        camera.position.set(map.getProperties().get("width", Integer.class) / 2f,
+                map.getProperties().get("height", Integer.class) / 2f, 0);
 
+        camera.zoom = 7.5f;
+        camera.update();
+
+        mapRenderer.setView(camera);
     }
 
     @Override
@@ -553,7 +556,7 @@ public class NewFarmScreen implements Screen, GestureListener
         Gdx.app.log("FarmScreen", "Tapped..." + temp.x + ", " + temp.y);
 
         // Check if the plot info table is already displaying
-        if (!plotInfoTable.hasParent())
+        if (!plotInfoTable.hasParent() && !windowContainer.hasParent())
         {
             // Find the plot that was tapped, if any
             for (int i = 0; i < plotRects.size(); i++)
@@ -571,11 +574,15 @@ public class NewFarmScreen implements Screen, GestureListener
                         Sapling tree = plot.getPlantedTree();
                         if (tree == SaplingList.get(FruitType.APPLE))
                         {
-                            effect.load(Gdx.files.internal("part_fruit.p"), fruitParticles);
+                            effect.load(Gdx.files.internal("part_cherry.p"), fruitParticles);
+                        }
+                        else if (tree == SaplingList.get(FruitType.CHERRY))
+                        {
+                            effect.load(Gdx.files.internal("part_cherry.p"), fruitParticles);
                         }
                         else if (tree == SaplingList.get(FruitType.ORANGE))
                         {
-                            effect.load(Gdx.files.internal("part_orange.p"), fruitParticles);
+                            effect.load(Gdx.files.internal("part_cherry.p"), fruitParticles);
                         }
 
                         effect.setPosition(rect.x + 0.75f, rect.y + 1);

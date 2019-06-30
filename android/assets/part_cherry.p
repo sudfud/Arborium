@@ -148,6 +148,4 @@ premultipliedAlpha: false
 spriteMode: single
 - Image Paths -
 cherry_small.png
-orange_small.png
-apple_small.png
 

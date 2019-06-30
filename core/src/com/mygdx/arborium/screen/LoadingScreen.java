@@ -51,6 +51,7 @@ public class LoadingScreen implements Screen
         game.assetManager.load(Arborium.TREE_DEFAULT2X, Texture.class);
         game.assetManager.load(Arborium.APPLE_TREE2X, Texture.class);
         game.assetManager.load(Arborium.ORANGE_TREE2X, Texture.class);
+        game.assetManager.load(Arborium.CHERRY_TREE, Texture.class);
         game.assetManager.load(Arborium.TREE_OVERWORLD, Texture.class);
 
         game.assetManager.load(Arborium.APPLE_SEED, Texture.class);
@@ -59,6 +60,7 @@ public class LoadingScreen implements Screen
 
         game.assetManager.load(Arborium.APPLE_FRUIT, Texture.class);
         game.assetManager.load(Arborium.ORANGE_FRUIT, Texture.class);
+        game.assetManager.load(Arborium.CHERRY_FRUIT, Texture.class);
 
         game.assetManager.load(Arborium.BASKET, Texture.class);
 

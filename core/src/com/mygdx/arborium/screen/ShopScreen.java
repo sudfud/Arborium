@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
@@ -53,6 +54,8 @@ public class ShopScreen implements Screen
 
     Button leftButton;
     Button rightButton;
+
+    PriceLabel currencyLabel;
 
     Window shopBuyWindow;
     TextButton buyButton;
@@ -175,11 +178,14 @@ public class ShopScreen implements Screen
         camera = new OrthographicCamera();
         //camera.setToOrtho();
 
-        stage = new Stage(new FitViewport(800, 480));
+        stage = new Stage(new ExtendViewport(800, 480));
         skin = game.getSkin(Arborium.ARBOR_SKIN);
 
         shopTable = new Table();
         shopTable.setFillParent(true);
+
+        currencyLabel = new PriceLabel(game);
+        currencyLabel.setText("" + Currency.getAmount());
 
         leftButton = new Button(skin, "left");
         rightButton = new Button(skin, "right");
@@ -284,6 +290,8 @@ public class ShopScreen implements Screen
                     Inventory.takeItem(selectItem.itemName, quantity);
                     hideTransactionWindow();
                 }
+
+                currencyLabel.setText("" + Currency.getAmount());
             }
         });
 
@@ -352,7 +360,9 @@ public class ShopScreen implements Screen
         shopBuyWindow.add(sellPriceLabel);
         shopBuyWindow.pack();
 
-        shopTable.add(shopBuyWindow).maxWidth(750).minHeight(500);
+        shopTable.add(currencyLabel).expand().top();
+        shopTable.row();
+        shopTable.add(shopBuyWindow).expand().maxWidth(750).minHeight(500).top();
         shopTable.row();
         shopTable.add(backButton);
 
@@ -403,7 +413,7 @@ public class ShopScreen implements Screen
         }
         else
         {
-            itemImage.clear();
+            itemImage.setDrawable(null);
             itemDescription.setText("Hey, you don't have any of these items yet!");
             buyPriceLabel.setVisible(false);
             sellPriceLabel.setVisible(false);

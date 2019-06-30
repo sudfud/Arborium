@@ -51,11 +51,14 @@ public class Arborium extends Game
 	public static final String ORANGE_TREE = "orange_tree.png";
 	public static final String ORANGE_TREE2X = "orange_tree2x.png";
 
+	public static final String CHERRY_TREE = "cherry_tree2x.png";
+
     public static final String APPLE_SEED = "seed1.png";
     public static final String ORANGE_SEED = "seed2.png";
 
     public static final String APPLE_FRUIT = "apple2x.png";
 	public static final String ORANGE_FRUIT = "orange2x.png";
+	public static final String CHERRY_FRUIT = "cherry.png";
 	
 	public static final String BASKET = "basket.png";
 

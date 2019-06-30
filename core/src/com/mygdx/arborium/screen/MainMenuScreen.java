@@ -110,7 +110,7 @@ public class MainMenuScreen implements Screen
         table.row();
         table.add(quitButton).width(200).height(100).expand().bottom();
 
-        arborAtlas = new TextureAtlas("arborium.atlas");
+        //arborAtlas = new TextureAtlas("Arborium.atlas");
         //cloudParticles = new ParticleEffect();
         //cloudParticles.load(Gdx.files.internal("clouds.p"), arborAtlas);
     }

@@ -7,7 +7,8 @@ public class Fruit extends ShopItem
     public enum FruitType
     {
         APPLE(0),
-        ORANGE(1);
+        ORANGE(1),
+        CHERRY(2);
 
         int value;
 
