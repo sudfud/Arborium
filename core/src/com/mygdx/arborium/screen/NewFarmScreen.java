@@ -180,7 +180,7 @@ public class NewFarmScreen implements Screen, GestureListener
         farm.update();
 
         // Clear screen
-        Gdx.gl.glClearColor(100/255f, 1, 244/255f, 1);
+        Gdx.gl.glClearColor(50/255f, 1, 244/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         mapRenderer.render();
@@ -574,7 +574,7 @@ public class NewFarmScreen implements Screen, GestureListener
                         Sapling tree = plot.getPlantedTree();
                         if (tree == SaplingList.get(FruitType.APPLE))
                         {
-                            effect.load(Gdx.files.internal("part_cherry.p"), fruitParticles);
+                            effect.load(Gdx.files.internal("part_fruit.p"), fruitParticles);
                         }
                         else if (tree == SaplingList.get(FruitType.CHERRY))
                         {
@@ -582,7 +582,7 @@ public class NewFarmScreen implements Screen, GestureListener
                         }
                         else if (tree == SaplingList.get(FruitType.ORANGE))
                         {
-                            effect.load(Gdx.files.internal("part_cherry.p"), fruitParticles);
+                            effect.load(Gdx.files.internal("part_orange.p"), fruitParticles);
                         }
 
                         effect.setPosition(rect.x + 0.75f, rect.y + 1);

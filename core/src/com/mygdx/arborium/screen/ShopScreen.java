@@ -360,11 +360,11 @@ public class ShopScreen implements Screen
         shopBuyWindow.add(sellPriceLabel);
         shopBuyWindow.pack();
 
-        shopTable.add(currencyLabel).expand().top();
-        shopTable.row();
-        shopTable.add(shopBuyWindow).expand().maxWidth(750).minHeight(500).top();
-        shopTable.row();
-        shopTable.add(backButton);
+//        shopTable.add(currencyLabel).expand().top();
+//        shopTable.row();
+//        shopTable.add(shopBuyWindow).expand().maxWidth(750).minHeight(500).top();
+//        shopTable.row();
+//        shopTable.add(backButton);
 
         transactionWindow.row();
         transactionWindow.add(decrementButton).pad(25);
@@ -379,6 +379,12 @@ public class ShopScreen implements Screen
 
         transactionWindowContainer.setActor(transactionWindow);
 
+        shopTable.setDebug(true);
+
+        shopTable.add(itemSelectBox).top();
+        shopTable.row();
+        //itemImage.setScale(2);
+        shopTable.add(itemImage).size(500).expand();
         stage.addActor(shopTable);
     }
 

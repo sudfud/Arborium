@@ -32,7 +32,7 @@ public class SaplingList
                 .matureTime(60 * 60 * 1000)
                 .produce(FruitList.get(Fruit.FruitType.APPLE))
                 .produceRate(20 * 60 * 1000)
-                .produceAmount(5)
+                .produceAmount(2)
                 .build();
 
         orangeSapling = new Sapling.Builder(65, "Orange Tree", game.getTexture(Arborium.ORANGE_TREE2X), orangeSapDesc, 600, false)
@@ -41,14 +41,14 @@ public class SaplingList
                 .produce(FruitList.get(Fruit.FruitType.ORANGE))
                 //.produceRate(7 * 60 * 1000)
                 .produceRate(30 * 1000)
-                .produceAmount(8)
+                .produceAmount(4)
                 .build();
 
         cherrySapling = new Sapling.Builder(66, "Cherry Tree", game.getTexture(Arborium.CHERRY_TREE), cherrySapDesc, 1500, false)
                 .matureTime(30 * 1000)
                 .produce(FruitList.get(Fruit.FruitType.CHERRY))
                 .produceRate(30 * 1000)
-                .produceAmount(1)
+                .produceAmount(8)
                 .build();
 
         saplingMap.put(Fruit.FruitType.APPLE, appleSapling);
