@@ -2,16 +2,16 @@ apple
 - Delay -
 active: false
 - Duration - 
-lowMin: 750.0
-lowMax: 750.0
+lowMin: 1000.0
+lowMax: 1000.0
 - Count - 
 min: 0
-max: 5
+max: 8
 - Emission - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 10.0
-highMax: 10.0
+highMin: 8.0
+highMax: 8.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -20,8 +20,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 500.0
-highMax: 500.0
+highMin: 1000.0
+highMax: 1000.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -33,8 +33,8 @@ active: false
 independent: false
 - X Offset - 
 active: true
-lowMin: -0.25
-lowMax: 0.25
+lowMin: -0.1
+lowMax: 0.1
 highMin: 0.0
 highMax: 0.0
 relative: false
@@ -93,10 +93,10 @@ timeline0: 0.0
 active: false
 - Rotation - 
 active: true
-lowMin: 0.0
-lowMax: 0.0
-highMin: 15.0
-highMax: -15.0
+lowMin: -2.5
+lowMax: -2.5
+highMin: 2.5
+highMax: 2.5
 relative: false
 scalingCount: 2
 scaling0: 1.0

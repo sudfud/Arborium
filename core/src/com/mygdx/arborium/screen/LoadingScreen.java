@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -59,12 +60,16 @@ public class LoadingScreen implements Screen
         game.assetManager.load("seed3.png", Texture.class);
 
         game.assetManager.load(Arborium.APPLE_FRUIT, Texture.class);
+        game.assetManager.load(Arborium.APPLE_LARGE, Texture.class);
         game.assetManager.load(Arborium.ORANGE_FRUIT, Texture.class);
+        game.assetManager.load(Arborium.ORANGE_LARGE, Texture.class);
         game.assetManager.load(Arborium.CHERRY_FRUIT, Texture.class);
 
         game.assetManager.load(Arborium.BASKET, Texture.class);
 
         game.assetManager.load(Arborium.COIN, Texture.class);
+
+        game.assetManager.load(Arborium.ATLAS_DIR, TextureAtlas.class);
 
         for (int i = 0; i <= 123; i++)
         {
@@ -75,6 +80,7 @@ public class LoadingScreen implements Screen
         game.assetManager.finishLoadingAsset(Arborium.GLASSY_SKIN);
         game.assetManager.finishLoadingAsset(Arborium.ARBOR_SKIN);
         game.assetManager.finishLoadingAsset(Arborium.BG_SKY);
+        game.assetManager.finishLoadingAsset(Arborium.ATLAS_DIR);
         game.assetManager.finishLoadingAsset(Arborium.CLOUD);
 
         Skin skin = game.getSkin(Arborium.ARBOR_SKIN);

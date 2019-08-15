@@ -56,8 +56,10 @@ public class Arborium extends Game
     public static final String APPLE_SEED = "seed1.png";
     public static final String ORANGE_SEED = "seed2.png";
 
-    public static final String APPLE_FRUIT = "apple2x.png";
+	public static final String APPLE_FRUIT = "apple2x.png";
+	public static final String APPLE_LARGE = "apple16x.png";
 	public static final String ORANGE_FRUIT = "orange2x.png";
+	public static final String ORANGE_LARGE = "orange16x.png";
 	public static final String CHERRY_FRUIT = "cherry.png";
 	
 	public static final String BASKET = "basket.png";
@@ -65,6 +67,8 @@ public class Arborium extends Game
 	public static final String TREE_ANIM = "Tree2/sprite_tree_2";
 	
 	public static final String COIN = "coin.png";
+
+	public static final String ATLAS_DIR = "arborium.atlas";
 
 	public int GDX_WIDTH;
 	public int GDX_HEIGHT;

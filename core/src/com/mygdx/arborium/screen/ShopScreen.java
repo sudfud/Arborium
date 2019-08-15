@@ -2,9 +2,9 @@ package com.mygdx.arborium.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,10 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -25,11 +23,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.arborium.Arborium;
 import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Inventory;
+import com.mygdx.arborium.game.Transaction;
 import com.mygdx.arborium.items.Fruit;
 import com.mygdx.arborium.items.Item;
 import com.mygdx.arborium.items.Sapling;
@@ -38,10 +35,10 @@ import com.mygdx.arborium.ui.PriceLabel;
 
 public class ShopScreen implements Screen
 {
-    int quantity = 1;
-    int totalPrice = 0;
+    Transaction transaction;
 
-    boolean buying = true;
+    String[] itemList;
+    int itemSelectIndex = 0;
 
     final Arborium game;
 
@@ -55,38 +52,33 @@ public class ShopScreen implements Screen
     Button leftButton;
     Button rightButton;
 
+    // Shop window UI Elements
+    Window shopWindow;
     PriceLabel currencyLabel;
-
-    Window shopBuyWindow;
     TextButton buyButton;
     TextButton sellButton;
     PriceLabel buyPriceLabel;
     PriceLabel sellPriceLabel;
     SelectBox<Category> itemSelectBox;
-    List<String> itemList;
-
-    TextButton backButton;
 
     ShopItem selectItem;
 
-    Window shopSellWindow;
-
+    // Transaction window UI elements
     Container<Window> transactionWindowContainer;
     Window transactionWindow;
     Label quantityLabel;
     Button decrementButton;
     Button incrementButton;
-
     PriceLabel totalPriceLabel;
-
     TextButton confirmButton;
     TextButton transactionBackButton;
     TextButton sellAllButton;
+    TextButton[] quantityButtons;
 
     Image itemImage;
     Label itemDescription;
 
-
+    TextButton backButton;
 
     enum Category
     {
@@ -100,31 +92,6 @@ public class ShopScreen implements Screen
         initialize();
         addUIListeners();
 
-        // Setup item list
-        String[] saplings = Item.getItemsOfType(Sapling.class);
-        itemList.setItems(saplings);
-
-        itemList.addListener(new ChangeListener()
-        {
-            @Override
-            public void changed(ChangeEvent event, Actor actor)
-            {
-                updateShopWindow();
-                if (!itemList.getItems().isEmpty())
-                {
-                    ShopItem item = (ShopItem) Item.lookup(itemList.getSelected());
-                    buyButton.setVisible(item.buyValue > 0);
-                    sellButton.setVisible(item.sellValue > 0);
-                }
-                else
-                {
-                    buyButton.setVisible(false);
-                    sellButton.setVisible(false);
-                }
-            }
-        });
-
-        itemList.setSelectedIndex(0);
         updateShopWindow();
 
         buildUI();
@@ -175,6 +142,8 @@ public class ShopScreen implements Screen
 
     private void initialize()
     {
+        Texture coin = game.getTexture(Arborium.COIN);
+
         camera = new OrthographicCamera();
         //camera.setToOrtho();
 
@@ -184,22 +153,23 @@ public class ShopScreen implements Screen
         shopTable = new Table();
         shopTable.setFillParent(true);
 
-        currencyLabel = new PriceLabel(game);
+        currencyLabel = new PriceLabel(coin, skin);
         currencyLabel.setText("" + Currency.getAmount());
 
         leftButton = new Button(skin, "left");
         rightButton = new Button(skin, "right");
 
-        shopBuyWindow = new Window("Buy", skin);
+        shopWindow = new Window("Buy", skin);
+        //shopBuyWindow.setDebug(true);
 
-        shopSellWindow = new Window("Sell", skin);
         buyButton = new TextButton("Buy", skin);
         sellButton = new TextButton("Sell", skin);
 
         itemSelectBox = new SelectBox<Category>(skin);
         itemSelectBox.setItems(Category.values());
 
-        itemList = new List<String>(skin);
+        itemList = new String[0];
+        updateItemList();
 
         itemImage = new Image(new TextureRegionDrawable(game.getTexture(Arborium.COIN)));
         itemDescription = new Label("Test description! :)", skin);
@@ -207,8 +177,8 @@ public class ShopScreen implements Screen
 
         backButton = new TextButton("Back", skin);
 
-        buyPriceLabel = new PriceLabel(game);
-        sellPriceLabel = new PriceLabel(game);
+        buyPriceLabel = new PriceLabel(coin, skin);
+        sellPriceLabel = new PriceLabel(coin, skin);
 
         transactionWindowContainer = new Container<Window>();
         transactionWindowContainer.setFillParent(true);
@@ -221,7 +191,10 @@ public class ShopScreen implements Screen
         confirmButton = new TextButton("OK", skin);
         transactionBackButton = new TextButton("Back", skin);
 
-        totalPriceLabel = new PriceLabel(game);
+        totalPriceLabel = new PriceLabel(coin, skin);   
+
+        selectItem = (ShopItem) Item.lookup(itemList[itemSelectIndex]);
+        transaction = new Transaction(selectItem, true);
     }
 
     private void addUIListeners()
@@ -231,7 +204,8 @@ public class ShopScreen implements Screen
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
-                updateItemList();
+                itemSelectIndex = 0;
+                updateShopWindow();
             }
         });
 
@@ -240,22 +214,29 @@ public class ShopScreen implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                buying = !buying;
-
-                if (buying)
-                {
-                    shopBuyWindow.getTitleLabel().setText("Sell");
-
-                }
+                itemSelectIndex--;
+                updateShopWindow();
             }
         });
+
+        rightButton.addListener(new ClickListener()
+        {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                itemSelectIndex++;
+                updateShopWindow();
+            }
+        });
+
 
         buyButton.addListener(new ClickListener()
         {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                buying = true;
+                //buying = true;
+                transaction.setPurchase(true);
                 updateTransactionWindow();
                 showTransactionWindow();
             }
@@ -266,7 +247,8 @@ public class ShopScreen implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                buying = false;
+                //buying = false;
+                transaction.setPurchase(false);
                 updateTransactionWindow();
                 showTransactionWindow();
             }
@@ -277,21 +259,10 @@ public class ShopScreen implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                int currency = Currency.getAmount();
-                if (buying && currency >= totalPrice)
-                {
-                    Currency.subtract(totalPrice);
-                    Inventory.addItem(selectItem.itemName, quantity);
-                    hideTransactionWindow();
-                }
-                else if (!buying)
-                {
-                    Currency.add(totalPrice);
-                    Inventory.takeItem(selectItem.itemName, quantity);
-                    hideTransactionWindow();
-                }
+                transaction.apply();
 
                 currencyLabel.setText("" + Currency.getAmount());
+                itemSelectIndex = 0;
             }
         });
 
@@ -300,8 +271,7 @@ public class ShopScreen implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                if (quantity > 1)
-                    quantity--;
+                transaction.changeQuantity(-1);
                 updateTransactionWindow();
             }
         });
@@ -310,16 +280,7 @@ public class ShopScreen implements Screen
         {
             public void clicked(InputEvent event, float x, float y)
             {
-                if (!buying)
-                {
-                    int itemCount = Inventory.getCount(selectItem.itemName);
-                    if (quantity < itemCount)
-                        quantity++;
-                }
-                else if ((quantity + 1) * selectItem.buyValue <= Currency.getAmount())
-                {
-                    quantity++;
-                }
+                transaction.changeQuantity(1);
                 updateTransactionWindow();
             }
         });
@@ -338,34 +299,14 @@ public class ShopScreen implements Screen
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                transactionWindowContainer.remove();
-                shopBuyWindow.setTouchable(Touchable.enabled);
+                hideTransactionWindow();
+                shopWindow.setTouchable(Touchable.enabled);
             }
         });
     }
 
     private void buildUI()
     {
-        shopBuyWindow.add(itemSelectBox).space(10).width(300).colspan(2).left();
-        shopBuyWindow.row();
-        shopBuyWindow.add(itemList).space(10).width(300).colspan(2).left();
-        shopBuyWindow.row();
-        shopBuyWindow.add(itemImage);
-        shopBuyWindow.add(itemDescription).width(500);
-        shopBuyWindow.row();
-        shopBuyWindow.add(buyButton);
-        shopBuyWindow.add(sellButton);
-        shopBuyWindow.row();
-        shopBuyWindow.add(buyPriceLabel);
-        shopBuyWindow.add(sellPriceLabel);
-        shopBuyWindow.pack();
-
-//        shopTable.add(currencyLabel).expand().top();
-//        shopTable.row();
-//        shopTable.add(shopBuyWindow).expand().maxWidth(750).minHeight(500).top();
-//        shopTable.row();
-//        shopTable.add(backButton);
-
         transactionWindow.row();
         transactionWindow.add(decrementButton).pad(25);
         transactionWindow.add(quantityLabel);
@@ -379,22 +320,41 @@ public class ShopScreen implements Screen
 
         transactionWindowContainer.setActor(transactionWindow);
 
-        shopTable.setDebug(true);
+        shopWindow.add(currencyLabel).expandX().colspan(2).space(25);
+        shopWindow.row();
+        shopWindow.add(itemSelectBox).top().expandX().colspan(2).space(25);
+        shopWindow.row();
+        shopWindow.add(itemImage).expandX().colspan(2);
+        shopWindow.row();
+        shopWindow.add(buyPriceLabel).space(25);
+        shopWindow.add(buyButton).space(25).fill();
+        shopWindow.row();
+        shopWindow.add(sellPriceLabel).space(25);
+        shopWindow.add(sellButton).fill();
+        shopWindow.pack();
 
-        shopTable.add(itemSelectBox).top();
+        shopTable.add(leftButton);
+        shopTable.add(shopWindow).expand().minWidth(500).minHeight(500);
+        shopTable.add(rightButton);
+
         shopTable.row();
-        //itemImage.setScale(2);
-        shopTable.add(itemImage).size(500).expand();
+        shopTable.add(backButton);
+
         stage.addActor(shopTable);
+        stage.addActor(transactionWindowContainer);
+        transactionWindowContainer.setVisible(false);
     }
 
     private void updateShopWindow()
     {
         updateItemList();
 
-        if (!itemList.getItems().isEmpty())
+        if (itemList.length > 0)
         {
-            selectItem = (ShopItem) Item.lookup(itemList.getSelected());
+            leftButton.setVisible(itemSelectIndex > 0);
+            rightButton.setVisible(itemSelectIndex < itemList.length - 1);
+
+            selectItem = (ShopItem) Item.lookup(itemList[itemSelectIndex]);
             itemImage.setDrawable(new TextureRegionDrawable(selectItem.itemImage));
             itemDescription.setText(selectItem.description);
 
@@ -405,17 +365,25 @@ public class ShopScreen implements Screen
             {
                 buyPriceLabel.setVisible(true);
                 buyPriceLabel.setText("" + buyPrice);
+                buyButton.setVisible(true);
             }
             else
+            {
                 buyPriceLabel.setVisible(false);
+                buyButton.setVisible(false);
+            }
 
             if (sellPrice > 0)
             {
                 sellPriceLabel.setVisible(true);
                 sellPriceLabel.setText("" + sellPrice);
+                sellButton.setVisible(true);
             }
             else
+            {
                 sellPriceLabel.setVisible(false);
+                sellButton.setVisible(false);
+            }
         }
         else
         {
@@ -424,30 +392,29 @@ public class ShopScreen implements Screen
             buyPriceLabel.setVisible(false);
             sellPriceLabel.setVisible(false);
         }
-        shopBuyWindow.invalidate();
+        shopWindow.invalidate();
     }
 
     private void updateTransactionWindow()
     {
-        quantityLabel.setText(quantity);
-
-        int price = buying? selectItem.buyValue : selectItem.sellValue;
-
-        totalPrice = price * quantity;
-        totalPriceLabel.setText("" + totalPrice);
+        transaction.setTransactionItem(selectItem);
+        quantityLabel.setText(transaction.getQuantity());
+        totalPriceLabel.setText("" + transaction.getTotalPrice());
     }
 
     private void showTransactionWindow()
     {
-        stage.addActor(transactionWindowContainer);
-        shopBuyWindow.setTouchable(Touchable.disabled);
+        //stage.addActor(transactionWindowContainer);
+        transactionWindowContainer.setVisible(true);
+        shopWindow.setTouchable(Touchable.disabled);
     }
 
     private void hideTransactionWindow()
     {
-        transactionWindowContainer.remove();
-        shopBuyWindow.setTouchable(Touchable.enabled);
-        quantity = 1;
+        //transactionWindowContainer.remove();
+        transactionWindowContainer.setVisible(false);
+        shopWindow.setTouchable(Touchable.enabled);
+        transaction.reset();
         updateShopWindow();
     }
 
@@ -458,15 +425,13 @@ public class ShopScreen implements Screen
             case Upgrades:
             case Saplings:
             {
-                String[] saplings = Item.getItemsOfType(Sapling.class);
-                itemList.setItems(saplings);
+                itemList = Item.getItemsOfType(Sapling.class);
                 break;
             }
 
             case Fruit:
             {
-                String[] fruits = Inventory.getItemsOfType(Fruit.class);
-                itemList.setItems(fruits);
+                itemList = Inventory.getItemsOfType(Fruit.class);
                 break;
             }
         }

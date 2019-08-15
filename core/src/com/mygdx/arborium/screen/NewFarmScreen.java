@@ -40,6 +40,7 @@ import com.mygdx.arborium.game.Currency;
 import com.mygdx.arborium.game.Farm;
 import com.mygdx.arborium.game.Inventory;
 import com.mygdx.arborium.game.Plot;
+import com.mygdx.arborium.game.Plot.PlotState;
 import com.mygdx.arborium.items.Item;
 import com.mygdx.arborium.items.Sapling;
 import com.mygdx.arborium.items.SaplingList;
@@ -145,11 +146,7 @@ public class NewFarmScreen implements Screen, GestureListener
         plainTreeDrawable = new TextureRegionDrawable(game.getTexture(Arborium.TREE_DEFAULT2X));
 
         treeParticleMap = new HashMap<Sapling,TextureAtlas>();
-        fruitParticles = new TextureAtlas("particles.atlas");
-        //orangeParticle = new TextureAtlas(Arborium.ORANGE_FRUIT);
-
-        //treeParticleMap.put(SaplingList.get(FruitType.APPLE), appleParticle);
-        //treeParticleMap.put(SaplingList.get(FruitType.ORANGE), orangeParticle);
+        fruitParticles = new TextureAtlas("arborium.atlas");
 
         effects = new Array<ParticleEffectPool.PooledEffect>();
 
@@ -204,7 +201,7 @@ public class NewFarmScreen implements Screen, GestureListener
                     break;
                 case HARVESTABLE:
                     Texture fruityTree = plot.getPlantedTree().itemImage;
-                    game.spriteBatch.draw(fruityTree, rect.x, rect.y, fruityTree.getWidth()/128f, fruityTree.getHeight()/128f);
+                    game.spriteBatch.draw(fruityTree, rect.x, rect.y + 4/16f, fruityTree.getWidth()/128f, fruityTree.getHeight()/128f);
                     break;
                 default:
                     break;
@@ -236,7 +233,7 @@ public class NewFarmScreen implements Screen, GestureListener
         // Background table initialization
 
         backTable = new Table();
-        currencyLabel = new PriceLabel(game);
+        currencyLabel = new PriceLabel(game.getTexture(Arborium.COIN), skin);
         menuButton = new TextButton("Menu", skin);
         shopButton = new TextButton("Shop", skin);
 
@@ -349,6 +346,18 @@ public class NewFarmScreen implements Screen, GestureListener
             public void clicked(InputEvent event, float x, float y)
             {
                 stage.addActor(windowContainer);
+                plotInfoTable.remove();
+            }
+        });
+
+        clearButton.addListener(new ClickListener()
+        {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                Plot plot = farm.getPlot(selectedPlot);
+                if (plot.getCurrentState() == PlotState.EMPTY)
+                    plot.clear();
                 plotInfoTable.remove();
             }
         });

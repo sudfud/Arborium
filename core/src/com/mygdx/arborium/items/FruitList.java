@@ -16,8 +16,8 @@ public class FruitList
     {
         fruitMap = new HashMap<Fruit.FruitType, Fruit>();
 
-        apple = new Fruit(1, "Apple", game.getTexture(Arborium.APPLE_FRUIT), 50, false);
-        orange = new Fruit(2, "Orange", game.getTexture(Arborium.ORANGE_FRUIT), 75, false);
+        apple = new Fruit(1, "Apple", game.getTexture(Arborium.APPLE_LARGE), 50, false);
+        orange = new Fruit(2, "Orange", game.getTexture(Arborium.ORANGE_LARGE), 75, false);
         cherry = new Fruit(3, "Cherry", game.getTexture(Arborium.CHERRY_FRUIT), 15, false);
 
         fruitMap.put(Fruit.FruitType.APPLE, apple);

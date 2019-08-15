@@ -1,5 +1,5 @@
 
-Arborium.png
+arborium.png
 size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
@@ -13,7 +13,7 @@ apple2x
   index: -1
 apple_small
   rotate: false
-  xy: 2, 2
+  xy: 198, 66
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -48,7 +48,7 @@ cherry2x
   index: -1
 cherry_small
   rotate: false
-  xy: 198, 66
+  xy: 458, 454
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -90,7 +90,7 @@ orange2x
   index: -1
 orange_small
   rotate: false
-  xy: 328, 162
+  xy: 20, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -114,6 +114,20 @@ orange_tree2x
   xy: 2, 182
   size: 128, 160
   orig: 128, 160
+  offset: 0, 0
+  index: -1
+peach
+  rotate: false
+  xy: 2, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+peach4x
+  rotate: false
+  xy: 328, 114
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1
 plant

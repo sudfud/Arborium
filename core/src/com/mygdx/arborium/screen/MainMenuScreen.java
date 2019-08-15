@@ -72,13 +72,13 @@ public class MainMenuScreen implements Screen
         stage = new Stage(new ExtendViewport(800, 480));
         table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
+        //table.setDebug(true);
         stage.addActor(table);
-        stage.addActor(cloudImage);
+        //stage.addActor(cloudImage);
 
         title = new ImageTextButton("Arborium", skin, "title");
         //title.setPosition(0, 0);
-        table.add(title);
+        table.add(title).center();
 
         // Setup start button
         startButton = new TextButton("Start", skin);
@@ -93,7 +93,7 @@ public class MainMenuScreen implements Screen
         });
         startButton.setPosition(game.GDX_WIDTH/2, -200);
         table.row();
-        table.add(startButton).width(200).height(100).space(100);
+        table.add(startButton).width(200).height(100).space(25).expandX();
 
 
         // Setup quit button
@@ -108,11 +108,11 @@ public class MainMenuScreen implements Screen
             }
         });
         table.row();
-        table.add(quitButton).width(200).height(100).expand().bottom();
+        table.add(quitButton).width(200).height(100).space(25).expandX();
 
-        //arborAtlas = new TextureAtlas("Arborium.atlas");
-        //cloudParticles = new ParticleEffect();
-        //cloudParticles.load(Gdx.files.internal("clouds.p"), arborAtlas);
+        arborAtlas = new TextureAtlas(Gdx.files.internal("arborium.atlas"));
+        cloudParticles = new ParticleEffect();
+        cloudParticles.load(Gdx.files.internal("falling_fruits.p"), arborAtlas);
     }
 
     @Override
@@ -126,8 +126,8 @@ public class MainMenuScreen implements Screen
         action.setPosition(game.GDX_WIDTH, game.GDX_HEIGHT*4/5);
         action.setDuration(10);
         cloudImage.addAction(action);
-      //  cloudParticles.setPosition(-1, 8);
-      //  cloudParticles.start();
+        cloudParticles.setPosition(0, 10);
+        cloudParticles.start();
     }
 
     @Override
@@ -138,9 +138,13 @@ public class MainMenuScreen implements Screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         // Draw background
+
+        game.spriteBatch.setProjectionMatrix(camera.combined);
+
         game.spriteBatch.begin();
-       // cloudParticles.draw(game.spriteBatch, Gdx.graphics.getDeltaTime());
-        game.spriteBatch.end();
+        // cloudParticles.draw(game.spriteBatch, Gdx.graphics.getDeltaTime());
+        cloudParticles.draw(game.spriteBatch, Gdx.graphics.getDeltaTime());
+         game.spriteBatch.end();
 
         // Update and draw UI
         stage.act();
@@ -148,8 +152,13 @@ public class MainMenuScreen implements Screen
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width, int height)
+    {
+        float aspectRatio = (float) width / (float) height;
+        camera = new OrthographicCamera(2f * aspectRatio, 2f);
 
+        camera.zoom = 7.5f;
+        camera.update();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.mygdx.arborium.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.arborium.Arborium;
@@ -126,12 +127,19 @@ public class Plot
         pref.flush();
     }
 
+    public void clear()
+    {
+        pref.clear();
+        updateState(PlotState.EMPTY);
+    }
+
     // Call this in the render() method
     public void update()
     {
         switch(currentState)
         {
             case EMPTY:
+            Gdx.app.log("Plot", "Im empty!");
                 break;
 
             case PREMATURE:
