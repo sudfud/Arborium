@@ -1,11 +1,17 @@
 package com.mygdx.arborium.items;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Json;
 import com.mygdx.arborium.Arborium;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SaplingList
 {
+    private static List<Sapling> saplingList;
+
     static HashMap<Fruit.FruitType, Sapling> saplingMap;
 
     Sapling appleSapling;
@@ -27,6 +33,7 @@ public class SaplingList
     public SaplingList(Arborium game)
     {
         saplingMap = new HashMap<Fruit.FruitType, Sapling>();
+        saplingList = new ArrayList<Sapling>();
 
         appleSapling = new Sapling.Builder(64, "Apple Tree", game.getTexture(Arborium.APPLE_TREE2X), appleSapDesc, 250, false)
                 .matureTime(40 * 60 * 1000)
@@ -54,6 +61,11 @@ public class SaplingList
         saplingMap.put(Fruit.FruitType.APPLE, appleSapling);
         saplingMap.put(Fruit.FruitType.ORANGE, orangeSapling);
         saplingMap.put(Fruit.FruitType.CHERRY, cherrySapling);
+
+        saplingList.add(appleSapling);
+        saplingList.add(orangeSapling);
+        saplingList.add(cherrySapling);
+
     }
 
     public static Sapling get(Fruit.FruitType type)

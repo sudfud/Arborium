@@ -51,7 +51,7 @@ public class Transaction
             return false;
 
         if (!isPurchase && offQuantity <= Inventory.getCount(transactionItem.itemName) || 
-            (isPurchase && totalPrice + price < Currency.getAmount()))
+            (isPurchase && totalPrice + price <= Currency.getAmount()))
         {
             quantity = offQuantity;
             totalPrice += price;

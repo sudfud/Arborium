@@ -10,30 +10,37 @@ import com.badlogic.gdx.graphics.Texture;
  */
 
 public abstract class ShopItem extends SpriteItem
-{
-    public final int buyValue;
-    public final int sellValue;
+//{
+//    public final int buyValue;
+//    public final int sellValue;
 
-    private boolean locked;
-
-    public final String description;
+//    private boolean locked;
+//
+//    public final String description;
 
     public ShopItem(int id, String name, Texture image, String description, int buyValue, int sellValue, boolean locked)
     {
+//        super(id, name, image);
+//        this.description = description;
+//        this.buyValue = buyValue;
+//        this.sellValue = sellValue;
+      //  this.locked = locked;
+
         super(id, name, image);
-        this.description = description;
-        this.buyValue = buyValue;
-        this.sellValue = sellValue;
-        this.locked = locked;
+        properties.put("description", description);
     }
 
-    public boolean isLocked()
+    public ShopItem(SpriteItem item)
     {
-        return locked;
+        super(item.id, item.itemName, item.itemImage);
     }
 
-    public void unlock()
-    {
-        locked = false;
-    }
+//  //  public boolean isLocked()
+//    {
+//  //      return locked;
+//    }
+//l`1   q2
+//    {
+//        locked = false;
+//    }
 }

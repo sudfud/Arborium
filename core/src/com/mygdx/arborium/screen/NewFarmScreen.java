@@ -356,7 +356,7 @@ public class NewFarmScreen implements Screen, GestureListener
             public void clicked(InputEvent event, float x, float y)
             {
                 Plot plot = farm.getPlot(selectedPlot);
-                if (plot.getCurrentState() == PlotState.EMPTY)
+                if (plot.getCurrentState() != PlotState.EMPTY)
                     plot.clear();
                 plotInfoTable.remove();
             }

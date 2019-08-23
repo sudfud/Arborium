@@ -22,10 +22,16 @@ public abstract class Item
     private static HashMap<String, Item> nameItemLookup = new HashMap<String, Item>();
     private static HashMap<Integer, Item> idItemLookup = new HashMap<Integer, Item>();
 
+    protected HashMap<String, Object> properties;
+
     public Item(int id, String name)
     {
         this.id = id;
         this.itemName = name;
+
+        properties = new HashMap<String, Object>();
+        properties.put("id", id);
+        properties.put("name", name);
 
         nameItemLookup.put(this.itemName, this);
         idItemLookup.put(this.id, this);
@@ -48,6 +54,17 @@ public abstract class Item
             return false;
         else
             return (id == ((Item) o).getId());
+    }
+
+    public Object getProperty(String key)
+    {
+        return properties.get(key);
+    }
+
+    public Item setProperty(String key, Object value)
+    {
+        properties.put(key, value);
+        return this;
     }
 
     public static Item lookup(String name)

@@ -263,6 +263,8 @@ public class ShopScreen implements Screen
 
                 currencyLabel.setText("" + Currency.getAmount());
                 itemSelectIndex = 0;
+
+                hideTransactionWindow();
             }
         });
 
@@ -358,8 +360,8 @@ public class ShopScreen implements Screen
             itemImage.setDrawable(new TextureRegionDrawable(selectItem.itemImage));
             itemDescription.setText(selectItem.description);
 
-            int buyPrice = selectItem.buyValue;
-            int sellPrice = selectItem.sellValue;
+            int buyPrice = (Integer)selectItem.getProperty("buy");
+            int sellPrice = (Integer)selectItem.getProperty("sell");
 
             if (buyPrice > 0)
             {
