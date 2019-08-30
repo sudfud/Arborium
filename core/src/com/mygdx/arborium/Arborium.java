@@ -52,15 +52,20 @@ public class Arborium extends Game
 	public static final String ORANGE_TREE2X = "orange_tree2x.png";
 
 	public static final String CHERRY_TREE = "cherry_tree2x.png";
+	public static final String PEACH_TREE = "peach_tree8x.png";
 
     public static final String APPLE_SEED = "seed1.png";
     public static final String ORANGE_SEED = "seed2.png";
 
 	public static final String APPLE_FRUIT = "apple2x.png";
 	public static final String APPLE_LARGE = "apple16x.png";
+
 	public static final String ORANGE_FRUIT = "orange2x.png";
 	public static final String ORANGE_LARGE = "orange16x.png";
+
 	public static final String CHERRY_FRUIT = "cherry.png";
+
+	public static final String PEACH_4X = "peach4x.png";
 	
 	public static final String BASKET = "basket.png";
 
@@ -170,5 +175,15 @@ public class Arborium extends Game
     public Texture getTexture(String fileName)
     {
         return assetManager.get(fileName, Texture.class);
-    }
+	}
+	
+	public Texture[] getTextures(String... fileNames)
+	{
+		Texture[] textures = new Texture[fileNames.length];
+
+		for (int i = 0; i < textures.length; i++)
+			textures[i] = assetManager.get(fileNames[i]);
+
+		return textures;
+	}
 }

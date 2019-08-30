@@ -10,21 +10,23 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class SpriteItem extends Item
 {
-    public SpriteItem(int id, String name, Texture image)
+    public final Texture sprite;
+
+    public SpriteItem(int id, String name, Texture sprite)
     {
         super(id, name);
-        properties.put("image", image);
+        this.sprite = sprite;
     }
 
-    public SpriteItem(Item item, Texture image)
+    public SpriteItem(Item item, Texture sprite)
     {
-        super(item.id, item.itemName);
-        properties.put("image", image);
+        super(item.id, item.name);
+        this.sprite = sprite;
     }
 
     public SpriteItem(int id, String name)
     {
         super(id, name);
-        properties.put("image", null);
+        sprite = null;
     }
 }

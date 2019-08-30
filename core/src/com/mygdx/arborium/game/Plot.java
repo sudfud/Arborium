@@ -123,7 +123,7 @@ public class Plot
 
         pref.putLong(plantTimeKey, plantedTime);
         pref.putLong(harvestKey, plantedTime);
-        pref.putString(fruitKey, tree.itemName);
+        pref.putString(fruitKey, tree.name);
         pref.flush();
     }
 
@@ -171,7 +171,7 @@ public class Plot
             lastHarvestTime = TimeUtils.millis();
 
             updateState(PlotState.MATURE);
-            Inventory.addItem(plantedTree.getProduce().itemName, plantedTree.getProduceAmount());
+            Inventory.addItem(plantedTree.getProduce().name, plantedTree.getProduceAmount());
             pref.putLong(harvestKey, lastHarvestTime);
             pref.flush();
         }

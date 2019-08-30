@@ -357,11 +357,11 @@ public class ShopScreen implements Screen
             rightButton.setVisible(itemSelectIndex < itemList.length - 1);
 
             selectItem = (ShopItem) Item.lookup(itemList[itemSelectIndex]);
-            itemImage.setDrawable(new TextureRegionDrawable(selectItem.itemImage));
-            itemDescription.setText(selectItem.description);
+            itemImage.setDrawable(new TextureRegionDrawable(selectItem.sprite));
+            itemDescription.setText(selectItem.getDescription());
 
-            int buyPrice = (Integer)selectItem.getProperty("buy");
-            int sellPrice = (Integer)selectItem.getProperty("sell");
+            int buyPrice = selectItem.getBuyValue();
+            int sellPrice = selectItem.getSellValue();
 
             if (buyPrice > 0)
             {

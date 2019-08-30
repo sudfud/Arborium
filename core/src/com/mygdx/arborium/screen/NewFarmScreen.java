@@ -200,7 +200,7 @@ public class NewFarmScreen implements Screen, GestureListener
                     game.spriteBatch.draw(tree, rect.x, rect.y, tree.getWidth()/64f, tree.getHeight()/64f);
                     break;
                 case HARVESTABLE:
-                    Texture fruityTree = plot.getPlantedTree().itemImage;
+                    Texture fruityTree = plot.getPlantedTree().sprite;
                     game.spriteBatch.draw(fruityTree, rect.x, rect.y + 4/16f, fruityTree.getWidth()/128f, fruityTree.getHeight()/128f);
                     break;
                 default:
@@ -283,7 +283,7 @@ public class NewFarmScreen implements Screen, GestureListener
                 if (saplingList.getItems().size > 0)
                 {
                     Sapling selectedSeed = saplingList.getSelected();
-                    seedImage.setDrawable(new TextureRegionDrawable(selectedSeed.itemImage));
+                    seedImage.setDrawable(new TextureRegionDrawable(selectedSeed.sprite));
                 }
                 else
                     seedImage.clear();
@@ -301,7 +301,7 @@ public class NewFarmScreen implements Screen, GestureListener
                     Sapling selectSapling = saplingList.getSelected();
                     Plot plot = farm.getPlot(selectedPlot);
                     plot.plantSapling(selectSapling);
-                    Inventory.takeItem(selectSapling.itemName);
+                    Inventory.takeItem(selectSapling.name);
                     windowContainer.remove();
                     updateSaplingList();
                 }
@@ -446,7 +446,7 @@ public class NewFarmScreen implements Screen, GestureListener
                 break;
 
             case HARVESTABLE:
-                Texture treeImage = plot.getPlantedTree().itemImage;
+                Texture treeImage = plot.getPlantedTree().sprite;
                 plotImage.setDrawable(new TextureRegionDrawable(treeImage));
                 break;
         }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.mygdx.arborium.Arborium;
 
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 /*
  * The game's inventory is managed by a hashmap with String keys and Integer values.
@@ -28,6 +29,8 @@ public class Inventory
 {
     private static Arborium game;
 
+    private ArrayList<Item> inventoryList;
+
     private static HashMap<String, Integer> inventory;
 
     private static Preferences pref = Arborium.preferences;
@@ -41,6 +44,11 @@ public class Inventory
 
     int maxCapacity = 50;
     int inventoryCount = 0;
+
+    public Inventory()
+    {
+        inventoryList = new ArrayList<Item>();
+    }
 
     public static void initialize(Arborium g)
     {
@@ -59,6 +67,24 @@ public class Inventory
             Gdx.app.log("Inventory", inventory.keySet().toString());
         }
         pref = Arborium.preferences;
+    }
+
+    public void add(Item item)
+    {
+        inventoryList.add(item);
+    }
+
+    public void remove(Item item)
+    {
+        inventoryList.remove(item);
+    }
+
+    public int getItemQuantity(Item item)
+    {
+        return (int)inventoryList.stream()
+            .filter(i -> i == item)
+            .count();
+
     }
 
     public static void addItem(String itemName, int count)

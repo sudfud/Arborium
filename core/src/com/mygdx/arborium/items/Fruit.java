@@ -18,7 +18,24 @@ public class Fruit extends ShopItem
         }
     }
 
-    public Fruit(int id, String name, Texture image, int sellValue, boolean locked) {
-        super(id, name, image, "", -1, sellValue, locked);
+    public Fruit(int id, String name, Texture image, int sellValue) 
+    {
+        super(id, name, image, "", -1, sellValue, false);
+    }
+
+    public Fruit(SpriteItem item)
+    {
+        super(item);
+        setBuyValue(-1);
+        setSellValue(-1);
+        setLock(false);
+    }
+
+    public Fruit(SpriteItem item, int sellValue)
+    {
+        super(item);
+        setBuyValue(-1);
+        setSellValue(sellValue);
+        setLock(false);
     }
 }

@@ -42,7 +42,7 @@ public class Transaction
 
     public boolean changeQuantity(int offset)
     {
-        int price = isPurchase? transactionItem.buyValue : transactionItem.sellValue;
+        int price = isPurchase? transactionItem.getBuyValue() : transactionItem.getSellValue();
         price *= offset;
 
         int offQuantity = quantity + offset;
@@ -50,7 +50,7 @@ public class Transaction
         if (offQuantity < 0)
             return false;
 
-        if (!isPurchase && offQuantity <= Inventory.getCount(transactionItem.itemName) || 
+        if (!isPurchase && offQuantity <= Inventory.getCount(transactionItem.name) || 
             (isPurchase && totalPrice + price <= Currency.getAmount()))
         {
             quantity = offQuantity;
@@ -67,12 +67,12 @@ public class Transaction
         if (isPurchase)
         {
             Currency.subtract(totalPrice);
-            Inventory.addItem(transactionItem.itemName, quantity);
+            Inventory.addItem(transactionItem.name, quantity);
         }
         else
         {
             Currency.add(totalPrice);
-            Inventory.takeItem(transactionItem.itemName, quantity);
+            Inventory.takeItem(transactionItem.name, quantity);
         }
     }
 
